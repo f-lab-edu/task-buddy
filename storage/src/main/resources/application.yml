@@ -1,3 +1,5 @@
+server:
+  port: 1300
 spring:
   application:
     name: storage

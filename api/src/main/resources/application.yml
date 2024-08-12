@@ -1,0 +1,6 @@
+server:
+  port: 1100
+spring:
+  application:
+    name: api
+

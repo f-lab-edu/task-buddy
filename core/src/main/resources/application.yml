@@ -1,0 +1,5 @@
+server:
+  port: 1200
+spring:
+  application:
+    name: core
