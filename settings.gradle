@@ -10,4 +10,3 @@ rootProject.name = 'task-buddy'
 include 'core'
 include 'storage'
 include 'api'
-
