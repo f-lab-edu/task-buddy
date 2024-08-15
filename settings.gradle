@@ -7,6 +7,6 @@ pluginManagement {
 
 rootProject.name = 'task-buddy'
 
-include 'core'
-include 'storage'
-include 'api'
+include ':core'
+include ':storage'
+include ':api'
