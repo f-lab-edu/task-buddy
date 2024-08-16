@@ -1,7 +1,5 @@
-// TODO 플러그인 중에 spring boot 플러그인의 bootJar False를 하는 대신 application 등의 jar를 사용할 수 있는지 확인해보기
 plugins {
     id 'java-library'
-    id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -15,12 +13,15 @@ repositories {
     mavenCentral()
 }
 
-bootJar.enabled = false
-jar.enabled = true
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.2" // Spring Boot 3.3.2 BOM 적용
+    }
+}
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation project(':storage')
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
 }
 
