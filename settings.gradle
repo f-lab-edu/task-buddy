@@ -3,3 +3,5 @@ rootProject.name = 'task-buddy'
 include ':core'
 include ':storage'
 include ':api'
+
+// TODO toolChain에 대해 알아보고 제대로 동작할 수 있는 플러그인 추가하기

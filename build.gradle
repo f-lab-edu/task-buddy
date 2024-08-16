@@ -1,3 +1,4 @@
+// TODO group과 version이 루트 프로젝트와 하위 모듈에 모두에 반드시 필요한지 알아보기
 allprojects {
     group = 'com.taskbuddy'
     version = '1.0-SNAPSHOT'
