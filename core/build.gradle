@@ -21,6 +21,7 @@ jar.enabled = true
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation project(':storage')
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
 }
 
 test {
