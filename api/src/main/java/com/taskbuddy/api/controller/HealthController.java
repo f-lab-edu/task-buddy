@@ -1,4 +1,4 @@
-package com.taskbuddy.api.common;
+package com.taskbuddy.api.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,5 +10,8 @@ public class HealthController {
 
     @ResponseStatus(code = HttpStatus.OK)
     @GetMapping("/health-check")
-    public void healthCheck() {}
+    public void healthCheck() {
+
+    }
+
 }
