@@ -43,17 +43,17 @@ class ApiResponseTest {
     @Test
     void fail로_실패상태의_객체를_생성할_수_있다() {
         //given
-        ErrorDetails givenErrorDetails = new ErrorDetails("NOT_FOUND_USER", "유저를 찾을 수 없습니다.");
+        ErrorDetail givenErrorDetail = new ErrorDetail("NOT_FOUND_USER", "유저를 찾을 수 없습니다.");
 
         //when
-        ApiResponse<?> result = ApiResponse.fail(givenErrorDetails);
+        ApiResponse<?> result = ApiResponse.fail(givenErrorDetail);
 
         //then
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(ResultStatus.FAIL);
         assertThat(result.getData()).isNull();
         assertThat(result.getError()).isNotNull();
-        assertThat(result.getError()).isEqualTo(givenErrorDetails);
+        assertThat(result.getError()).isEqualTo(givenErrorDetail);
     }
 
     @Test

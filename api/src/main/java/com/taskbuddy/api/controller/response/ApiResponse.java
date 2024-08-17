@@ -9,9 +9,9 @@ import org.springframework.util.Assert;
 public class ApiResponse<D> {
     private final ResultStatus status;
     private final D data;
-    private final ErrorDetails error;
+    private final ErrorDetail error;
 
-    private ApiResponse(ResultStatus status, D data, ErrorDetails error) {
+    private ApiResponse(ResultStatus status, D data, ErrorDetail error) {
         this.status = status;
         this.data = data;
         this.error = error;
@@ -21,7 +21,7 @@ public class ApiResponse<D> {
         return new ApiResponse<>(ResultStatus.SUCCESS, data, null);
     }
 
-    public static ApiResponse<?> fail(ErrorDetails error) {
+    public static ApiResponse<?> fail(ErrorDetail error) {
         Assert.notNull(error, "The error argument must not be null.");
 
         return new ApiResponse<>(ResultStatus.FAIL, null, error);
