@@ -1,11 +1,15 @@
 package com.taskbuddy.api.controller;
 
+import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
+import com.taskbuddy.api.controller.response.NoData;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 
 @RequestMapping("/v1/tasks")
@@ -20,7 +24,7 @@ public class TaskController {
 
     //TODO Response 클래스명이 API 응답 클래스라는게 잘 드러나는가?
     @GetMapping("/{id}")
-    ApiResponse<TaskResponse> getOne(@PathVariable("id") Long id) {
+    ResponseEntity<ApiResponse<TaskResponse>> getOne(@PathVariable("id") Long id) {
         Assert.notNull(id, "The id argument must not be null.");
         Assert.state(id >= 0, "The id value must be positive.");
 
@@ -34,16 +38,30 @@ public class TaskController {
                         LocalDateTime.of(2024, 8, 1, 0, 0, 0)
                         , LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
 
-        return ApiResponse.success(response);
+        return ResponseEntity
+                .ok(ApiResponse.success(response));
     }
 
+    //TODO RequestBody, RequestAttribute 차이점, 그리고 꼭 붙여야하는지
     @PostMapping
-    void create() {
+    ResponseEntity<ApiResponse<NoData>> create(@RequestBody TaskCreateRequest request) {
+        Assert.notNull(request, "Teh request argument must not be null.");
 
+        //Dummy
+        final long createdTaskId = 1L;
+
+        return ResponseEntity
+                .created(URI.create("localhost:8080/v1/tasks/" + createdTaskId))
+                .body(ApiResponse.success());
     }
 
     @PatchMapping("/{id}")
     void update(@PathVariable Long id) {
+
+    }
+
+    @PatchMapping("/{id}/done")
+    void checkedTask() {
 
     }
 

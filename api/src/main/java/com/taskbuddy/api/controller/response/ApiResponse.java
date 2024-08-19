@@ -21,6 +21,10 @@ public class ApiResponse<D> {
         return new ApiResponse<>(ResultStatus.SUCCESS, data, null);
     }
 
+    public static ApiResponse<NoData> success() {
+        return new ApiResponse<>(ResultStatus.SUCCESS, null, null);
+    }
+
     public static ApiResponse<?> fail(ErrorDetail error) {
         Assert.notNull(error, "The error argument must not be null.");
 
