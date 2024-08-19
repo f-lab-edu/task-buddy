@@ -6,6 +6,7 @@ import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.NoData;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.api.error.NotFoundResourceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,13 @@ import java.time.LocalDateTime;
 @RestController
 public class TaskController {
 
-    @GetMapping
-    ApiResponse<Object> getAll() {
-
-        return null;
-    }
-
     @GetMapping("/{id}")
-    ResponseEntity<ApiResponse<TaskResponse>> getOne(@PathVariable("id") Long id) {
+    ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
+
+        if (id == 0) {
+            throw new NotFoundResourceException("NOT_FOUND_TASK", "Task를 찾을 수 없습니다.");
+        }
 
         //Dummy
         TaskResponse response = new TaskResponse(
@@ -41,9 +40,8 @@ public class TaskController {
                 .ok(ApiResponse.success(response));
     }
 
-    //TODO RequestBody, RequestAttribute 차이점, 그리고 꼭 붙여야하는지
     @PostMapping
-    ResponseEntity<ApiResponse<NoData>> create(@RequestBody TaskCreateRequest request) {
+    ResponseEntity<ApiResponse<NoData>> createTask(@RequestBody TaskCreateRequest request) {
         Assert.notNull(request, "The request argument must not be null.");
 
         //Dummy
@@ -55,7 +53,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    ResponseEntity<ApiResponse<NoData>> update(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
+    ResponseEntity<ApiResponse<NoData>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
         Assert.notNull(request, "The request argument must not be null.");
 
@@ -63,16 +61,8 @@ public class TaskController {
                 .ok(ApiResponse.success());
     }
 
-    @PatchMapping("/{id}/done")
-    ResponseEntity<ApiResponse<NoData>> checkedTask(@PathVariable("id") Long id) {
-        Assert.state(id >= 0, "The id value must be positive.");
-
-        return ResponseEntity
-                .ok(ApiResponse.success());
-    }
-
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<NoData>> remove(@PathVariable("id") Long id) {
+    ResponseEntity<ApiResponse<NoData>> removeTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         return ResponseEntity

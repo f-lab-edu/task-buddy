@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -53,16 +54,21 @@ public class TestControllerTest {
         this.objectMapper = objectMapper;
     }
 
-    //TODO status Enumeration 문서작성하는 법
-    //TODO 실패 테스트케이스
     @Test
     void 사용자는_Task_정보를_조회할_수_있다() throws Exception {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
+                .andExpect(jsonPath("$.data.id", allOf(notNullValue(), greaterThan(0))))
+                .andExpect(jsonPath("$.data.title").exists())
+                .andExpect(jsonPath("$.data.isDone").exists())
+                .andExpect(jsonPath("$.data.timeFrame").exists())
                 .andDo(print())
-                .andDo(document("get-task-with-id",
+                .andDo(document("get-a-task-with-id",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
+                        ),
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),
@@ -79,6 +85,34 @@ public class TestControllerTest {
                                         fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
                                         fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
                                         fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)"))));
+    }
+
+    @Test
+    void 조회할_Task가_존재하지_않는다면_실패응답메시지를_받는다() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 0)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error.code").value("NOT_FOUND_TASK"))
+                .andExpect(jsonPath("$.error.message").value("Task를 찾을 수 없습니다."))
+                .andDo(print())
+                .andDo(document("failed-to-get-a-task-with-id",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
+                        ),
+                        pathParameters(
+                                parameterWithName("id").description("task id")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 헤더")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"),
+                                fieldWithPath("error").type(JsonFieldType.OBJECT).description("에러 상세정보"),
+                                fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
+                                fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 메시지")
+                        )));
     }
 
     @Test
