@@ -1,10 +1,10 @@
 package com.taskbuddy.api.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
+import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ResultStatus;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,17 +78,7 @@ public class TestControllerTest {
                                         fieldWithPath("isDone").type(JsonFieldType.BOOLEAN).description("완료 여부"),
                                         fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
                                         fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
-                                        fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)"))
-                ));
-    }
-
-    @Test
-    void name() throws JsonProcessingException {
-        TimeFrame timeFrame = new TimeFrame(
-                LocalDateTime.of(2024, 8, 1, 0, 0, 0),
-                LocalDateTime.of(2024, 8, 1, 23, 59, 59));
-        String value = objectMapper.writeValueAsString(LocalDateTime.of(2024, 8, 1, 0, 0, 0));
-        System.out.println("value = " + value);
+                                        fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)"))));
     }
 
     @Test
@@ -107,6 +97,7 @@ public class TestControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print())
                 .andDo(document("create-a-task",
                         requestHeaders(
@@ -121,9 +112,72 @@ public class TestControllerTest {
                                 fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)")
                         ),
                         responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 헤더")
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type"),
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 Task 조회 URL")
                         ),
                         responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("The status of teh response, e.g."))));
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+    }
+
+    @Test
+    void 사용자는_Task내용을_수정할_수_있다() throws Exception {
+        TaskUpdateRequest request = new TaskUpdateRequest(
+                "알고리즘 문제 풀기",
+                "백준1902..",
+                new TimeFrame(
+                        LocalDateTime.of(2024, 8, 31, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/v1/tasks/{id}", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print())
+                .andDo(document("update-a-task",
+                        pathParameters(
+                                parameterWithName("id").description("task id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
+                                fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
+                                fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+    }
+
+    @Test
+    void 사용자는_Task를_삭제할_수_있다() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/v1/tasks/{id}", 1)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andDo(print())
+                .andDo(document("remove-a-task",
+                        pathParameters(
+                                parameterWithName("id").description("task id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
     }
 }

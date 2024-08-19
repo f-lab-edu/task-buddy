@@ -1,6 +1,7 @@
 package com.taskbuddy.api.controller;
 
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
+import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.NoData;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
@@ -22,10 +23,8 @@ public class TaskController {
         return null;
     }
 
-    //TODO Response 클래스명이 API 응답 클래스라는게 잘 드러나는가?
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<TaskResponse>> getOne(@PathVariable("id") Long id) {
-        Assert.notNull(id, "The id argument must not be null.");
         Assert.state(id >= 0, "The id value must be positive.");
 
         //Dummy
@@ -45,7 +44,7 @@ public class TaskController {
     //TODO RequestBody, RequestAttribute 차이점, 그리고 꼭 붙여야하는지
     @PostMapping
     ResponseEntity<ApiResponse<NoData>> create(@RequestBody TaskCreateRequest request) {
-        Assert.notNull(request, "Teh request argument must not be null.");
+        Assert.notNull(request, "The request argument must not be null.");
 
         //Dummy
         final long createdTaskId = 1L;
@@ -56,18 +55,28 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    void update(@PathVariable Long id) {
+    ResponseEntity<ApiResponse<NoData>> update(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
+        Assert.state(id >= 0, "The id value must be positive.");
+        Assert.notNull(request, "The request argument must not be null.");
 
+        return ResponseEntity
+                .ok(ApiResponse.success());
     }
 
     @PatchMapping("/{id}/done")
-    void checkedTask() {
+    ResponseEntity<ApiResponse<NoData>> checkedTask(@PathVariable("id") Long id) {
+        Assert.state(id >= 0, "The id value must be positive.");
 
+        return ResponseEntity
+                .ok(ApiResponse.success());
     }
 
     @DeleteMapping("/{id}")
-    void remove(@PathVariable Long id) {
+    ResponseEntity<ApiResponse<NoData>> remove(@PathVariable("id") Long id) {
+        Assert.state(id >= 0, "The id value must be positive.");
 
+        return ResponseEntity
+                .ok(ApiResponse.success());
     }
 
 }
