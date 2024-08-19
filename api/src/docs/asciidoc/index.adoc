@@ -1,0 +1,34 @@
+[[resources-tasks]]
+== Task
+
+[[resources-tasks-get]]
+=== Task 조회
+
+`GET` 요청을 사용해서 기존 Task 하나를 조회할 수 있다.
+
+operation::get-a-task-with-id[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
+
+==== Task가 존재하지 않을 경우
+operation::failed-to-get-a-task-with-id[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
+
+
+[[resources-tasks-create]]
+=== Task 생성
+
+`POST` 요청을 사용해서 새 Task를 만들 수 있다.
+
+operation::create-a-task[snippets='request-headers,request-fields,http-request,response-headers,response-fields,http-response']
+
+[[resources-tasks-update]]
+=== Task 수정
+
+`PATCH` 요청을 사용해서 기존 Task를 수정할 수 있다.
+
+operation::update-a-task[snippets='request-headers,path-parameters,request-fields,http-request,response-headers,response-fields,http-response']
+
+[[resources-tasks-remove]]
+=== Task 삭제
+
+`DELETE` 요청을 사용해서 기존 Task를 수정할 수 있다.
+
+operation::remove-a-task[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
