@@ -21,7 +21,7 @@ public class ApiResponse<D> {
         return new ApiResponse<>(ResultStatus.SUCCESS, data, null);
     }
 
-    public static ApiResponse<NoData> success() {
+    public static ApiResponse<?> success() {
         return new ApiResponse<>(ResultStatus.SUCCESS, null, null);
     }
 

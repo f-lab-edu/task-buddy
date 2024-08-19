@@ -3,7 +3,6 @@ package com.taskbuddy.api.controller;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
-import com.taskbuddy.api.controller.response.NoData;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
 import com.taskbuddy.api.error.NotFoundResourceException;
@@ -41,7 +40,7 @@ public class TaskController {
     }
 
     @PostMapping
-    ResponseEntity<ApiResponse<NoData>> createTask(@RequestBody TaskCreateRequest request) {
+    ResponseEntity<ApiResponse<?>> createTask(@RequestBody TaskCreateRequest request) {
         Assert.notNull(request, "The request argument must not be null.");
 
         //Dummy
@@ -53,7 +52,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}")
-    ResponseEntity<ApiResponse<NoData>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
+    ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
         Assert.notNull(request, "The request argument must not be null.");
 
@@ -62,7 +61,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<NoData>> removeTask(@PathVariable("id") Long id) {
+    ResponseEntity<ApiResponse<?>> removeTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         return ResponseEntity
