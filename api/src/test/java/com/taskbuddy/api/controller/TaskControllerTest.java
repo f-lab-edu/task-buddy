@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //TODO IntegrationTest와 UnitTest가 모였을 때 Fast 태그로 나누자
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class})
-public class TestControllerTest {
+public class TaskControllerTest {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
