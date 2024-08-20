@@ -32,9 +32,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+//TODO IntegrationTest와 UnitTest가 모였을 때 Fast 태그로 나누자
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class})
 public class TestControllerTest {
@@ -58,14 +58,14 @@ public class TestControllerTest {
     void 사용자는_Task_정보를_조회할_수_있다() throws Exception {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 1L)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data.id", allOf(notNullValue(), greaterThan(0))))
                 .andExpect(jsonPath("$.data.title").exists())
                 .andExpect(jsonPath("$.data.isDone").exists())
                 .andExpect(jsonPath("$.data.timeFrame").exists())
-                .andDo(print())
-                .andDo(document("get-a-task-with-id",
+                .andDo(document("get-a-task-with-id/success",
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header")
                         ),
@@ -88,31 +88,33 @@ public class TestControllerTest {
     }
 
     @Test
-    void 조회할_Task가_존재하지_않는다면_실패응답메시지를_받는다() throws Exception {
+    void 조회할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 0)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andExpect(jsonPath("$.error.code").value("NOT_FOUND_TASK"))
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
                 .andExpect(jsonPath("$.error.message").value("Task를 찾을 수 없습니다."))
+                .andDo(document("get-a-task-with-id/fail/does-not-exist"));
+    }
+
+    @Test
+    void ID가_음수값이면_실패응답을_받는다() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", -1)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andDo(document("failed-to-get-a-task-with-id",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
-                        ),
-                        pathParameters(
-                                parameterWithName("id").description("task id")
-                        ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 헤더")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"),
-                                fieldWithPath("error").type(JsonFieldType.OBJECT).description("에러 상세정보"),
-                                fieldWithPath("error.code").type(JsonFieldType.STRING).description("에러 코드"),
-                                fieldWithPath("error.message").type(JsonFieldType.STRING).description("에러 메시지")
-                        )));
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The id value must be positive."))
+                .andDo(document("get-a-task-with-id/fail/negative-id-value"));
     }
 
     @Test
@@ -129,11 +131,11 @@ public class TestControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andDo(print())
-                .andDo(document("create-a-task",
+                .andDo(document("create-a-task/success",
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
@@ -171,7 +173,7 @@ public class TestControllerTest {
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print())
-                .andDo(document("update-a-task",
+                .andDo(document("update-a-task/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),
@@ -201,7 +203,7 @@ public class TestControllerTest {
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print())
-                .andDo(document("remove-a-task",
+                .andDo(document("remove-a-task/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),

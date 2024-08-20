@@ -5,7 +5,6 @@ import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
-import com.taskbuddy.api.error.NotFoundResourceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +15,14 @@ import java.time.LocalDateTime;
 @RequestMapping("/v1/tasks")
 @RestController
 public class TaskController {
-
+    // TODO spring boot validation 추가가 낫겠다. 일단 던지는 Exception에 대헤서 처리하고, Validation 도입하면 같이 붙여야지
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
+        // FIXME 서비스 로직 구현하면 제거하기 / Custom Exception 구현하기
         if (id == 0) {
-            throw new NotFoundResourceException("NOT_FOUND_TASK", "Task를 찾을 수 없습니다.");
+            throw new IllegalArgumentException("The given task with id does not exist");
         }
 
         //Dummy
