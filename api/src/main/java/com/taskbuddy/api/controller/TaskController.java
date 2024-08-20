@@ -20,7 +20,8 @@ public class TaskController {
     ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        // FIXME 서비스 로직 구현하면 제거하기 / Custom Exception 구현하기
+        // TODO Custom Exception 구현하기
+        // FIXME 서비스 로직 구현하면 제거하기
         if (id == 0) {
             throw new IllegalArgumentException("The given task with id does not exist");
         }
