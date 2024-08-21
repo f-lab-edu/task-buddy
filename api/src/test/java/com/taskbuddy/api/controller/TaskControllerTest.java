@@ -28,6 +28,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -44,7 +45,10 @@ public class TaskControllerTest {
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(documentationConfiguration(restDocumentation))
+                .apply(documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
                 .alwaysDo(document("v1/tasks/"))
                 .build();
 
@@ -273,6 +277,31 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
                 .andExpect(jsonPath("$.error.message").value("The title of task must not be blank."))
                 .andDo(document("update-a-task/fail/invalid-request-data"));
+    }
+
+    @Test
+    void 수정할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
+        TaskUpdateRequest request = new TaskUpdateRequest(
+                "알고리즘 문제 풀기",
+                "백준1902..",
+                new TimeFrame(
+                        LocalDateTime.of(2024, 8, 31, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+
+        mockMvc.perform(patch("/v1/tasks/{id}", 0)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
+                .andDo(document("update-a-task/fail/does-not-exist"));
     }
 
     @Test
