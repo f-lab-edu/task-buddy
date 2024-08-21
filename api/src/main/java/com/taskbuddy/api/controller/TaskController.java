@@ -23,7 +23,7 @@ public class TaskController {
         // TODO Custom Exception 구현하기
         // FIXME 서비스 로직 구현하면 제거하기
         if (id == 0) {
-            throw new IllegalArgumentException("The given task with id does not exist");
+            throw new IllegalArgumentException("The given task with id does not exist.");
         }
 
         //Dummy
@@ -42,8 +42,6 @@ public class TaskController {
 
     @PostMapping
     ResponseEntity<ApiResponse<?>> createTask(@RequestBody TaskCreateRequest request) {
-        Assert.notNull(request, "The request argument must not be null.");
-
         //Dummy
         final long createdTaskId = 1L;
 
@@ -55,7 +53,11 @@ public class TaskController {
     @PatchMapping("/{id}")
     ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
-        Assert.notNull(request, "The request argument must not be null.");
+
+        // FIXME 서비스 로직 구현하면 제거하기
+        if (id == 0) {
+            throw new IllegalArgumentException("The given task with id does not exist.");
+        }
 
         return ResponseEntity
                 .ok(ApiResponse.success());
@@ -64,6 +66,11 @@ public class TaskController {
     @DeleteMapping("/{id}")
     ResponseEntity<ApiResponse<?>> removeTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
+
+        // FIXME 서비스 로직 구현하면 제거하기
+        if (id == 0) {
+            throw new IllegalArgumentException("The given task with id does not exist.");
+        }
 
         return ResponseEntity
                 .ok(ApiResponse.success());

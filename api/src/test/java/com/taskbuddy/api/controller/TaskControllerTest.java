@@ -15,7 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,6 +27,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -56,7 +56,7 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task_정보를_조회할_수_있다() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 1L)
+        mockMvc.perform(get("/v1/tasks/{id}", 1L)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -89,7 +89,7 @@ public class TaskControllerTest {
 
     @Test
     void 조회할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", 0)
+        mockMvc.perform(get("/v1/tasks/{id}", 0)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -98,13 +98,13 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
-                .andExpect(jsonPath("$.error.message").value("Task를 찾을 수 없습니다."))
+                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
                 .andDo(document("get-a-task-with-id/fail/does-not-exist"));
     }
 
     @Test
-    void ID가_음수값이면_실패응답을_받는다() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/tasks/{id}", -1)
+    void 조회할_Task_ID가_음수값이면_실패응답을_받는다() throws Exception {
+        mockMvc.perform(get("/v1/tasks/{id}", -1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -126,7 +126,7 @@ public class TaskControllerTest {
                         LocalDateTime.of(2024, 8, 1, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 1, 23, 59, 59)));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/tasks")
+        mockMvc.perform(post("/v1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -156,6 +156,34 @@ public class TaskControllerTest {
     }
 
     @Test
+    void 등록데이터_조건을_만족하지_않는다면_실패응답을_받는다() throws Exception {
+        String emptyTitle = "";
+        String json = "{\n" +
+                "  \"title\":\" " + emptyTitle + " \",\n" +
+                "  \"description\":\"백준1902..\",\n" +
+                "  \"timeFrame\":{\n" +
+                "    \"startDateTime\":\"2024-08-01T00:00:00\",\n" +
+                "    \"endDateTime\":\"2024-08-01T23:59:59\"\n" +
+                "  }\n" +
+                "}";
+
+        mockMvc.perform(post("/v1/tasks")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The title of task must not be blank."))
+                .andDo(document("create-a-task/fail/invalid-request-data"))
+        ;
+    }
+
+    @Test
     void 사용자는_Task내용을_수정할_수_있다() throws Exception {
         TaskUpdateRequest request = new TaskUpdateRequest(
                 "알고리즘 문제 풀기",
@@ -164,7 +192,7 @@ public class TaskControllerTest {
                         LocalDateTime.of(2024, 8, 31, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/v1/tasks/{id}", 1)
+        mockMvc.perform(patch("/v1/tasks/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -196,8 +224,60 @@ public class TaskControllerTest {
     }
 
     @Test
+    void 수정할_Task_ID가_음수값이면_실패응답을_받는다() throws Exception {
+        TaskUpdateRequest request = new TaskUpdateRequest(
+                "알고리즘 문제 풀기",
+                "백준1902..",
+                new TimeFrame(
+                        LocalDateTime.of(2024, 8, 31, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+
+        mockMvc.perform(patch("/v1/tasks/{id}", -1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The id value must be positive."))
+                .andDo(document("update-a-task/fail/negative-id-value"));
+    }
+
+    @Test
+    void 수정데이터_조건을_만족하지_않는다면_실패응답을_받는다() throws Exception {
+        String emptyTitle = "";
+        String json = "{\n" +
+                "  \"title\":\" " + emptyTitle + " \",\n" +
+                "  \"description\":\"백준1902..\",\n" +
+                "  \"timeFrame\":{\n" +
+                "    \"startDateTime\":\"2024-08-01T00:00:00\",\n" +
+                "    \"endDateTime\":\"2024-08-01T23:59:59\"\n" +
+                "  }\n" +
+                "}";
+
+        mockMvc.perform(patch("/v1/tasks/{id}", 1)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The title of task must not be blank."))
+                .andDo(document("update-a-task/fail/invalid-request-data"));
+    }
+
+    @Test
     void 사용자는_Task를_삭제할_수_있다() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/v1/tasks/{id}", 1)
+        mockMvc.perform(delete("/v1/tasks/{id}", 1)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
@@ -215,5 +295,35 @@ public class TaskControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+    }
+
+    @Test
+    void 삭제할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
+        mockMvc.perform(delete("/v1/tasks/{id}", 0)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
+                .andDo(document("remove-a-task/fail/does-not-exist"));
+    }
+
+    @Test
+    void 삭제할_Task_ID가_음수값이면_실패응답을_받는다() throws Exception {
+        mockMvc.perform(delete("/v1/tasks/{id}", -1)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The id value must be positive."))
+                .andDo(document("remove-a-task/fail/negative-id-value"));
     }
 }
