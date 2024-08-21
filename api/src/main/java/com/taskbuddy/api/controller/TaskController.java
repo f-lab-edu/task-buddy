@@ -15,12 +15,10 @@ import java.time.LocalDateTime;
 @RequestMapping("/v1/tasks")
 @RestController
 public class TaskController {
-    // TODO spring boot validation 추가가 낫겠다. 일단 던지는 Exception에 대헤서 처리하고, Validation 도입하면 같이 붙여야지
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        // TODO Custom Exception 구현하기
         // FIXME 서비스 로직 구현하면 제거하기
         if (id == 0) {
             throw new IllegalArgumentException("The given task with id does not exist.");
