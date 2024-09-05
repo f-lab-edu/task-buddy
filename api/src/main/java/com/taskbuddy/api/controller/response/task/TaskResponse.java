@@ -16,8 +16,8 @@ public record TaskResponse (
                 task.description(),
                 task.isDone(),
                 new TimeFrame(
-                        task.startDateTime(),
-                        task.endDateTime())
+                        task.timeFrame().startDateTime(),
+                        task.timeFrame().endDateTime())
         );
     }
 }
