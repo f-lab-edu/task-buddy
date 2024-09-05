@@ -24,6 +24,7 @@ dependencies {
     implementation project(':storage')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
 }
 
 test {
