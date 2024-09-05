@@ -1,4 +1,13 @@
 package com.taskbuddy.core.domain;
 
-public record Task() {
+import java.time.LocalDateTime;
+
+public record Task(
+        Long id,
+        String title,
+        String description,
+        Boolean isDone,
+        LocalDateTime startDateTime,
+        LocalDateTime endDateTime
+) {
 }

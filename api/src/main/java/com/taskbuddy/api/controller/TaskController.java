@@ -4,35 +4,27 @@ import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
-import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.core.domain.Task;
+import com.taskbuddy.core.service.TaskService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 
+@RequiredArgsConstructor
 @RequestMapping("/v1/tasks")
 @RestController
 public class TaskController {
+    private final TaskService taskService;
+
     @GetMapping("/{id}")
     ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        // FIXME 서비스 로직 구현하면 제거하기
-        if (id == 0) {
-            throw new IllegalArgumentException("The given task with id does not exist.");
-        }
-
-        //Dummy
-        TaskResponse response = new TaskResponse(
-                1L
-                , "알고리즘 문제 풀기"
-                , "백준1902..."
-                , false
-                , new TimeFrame(
-                        LocalDateTime.of(2024, 8, 1, 0, 0, 0)
-                        , LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+        Task task = taskService.getTask(id);
+        TaskResponse response = TaskResponse.from(task);
 
         return ResponseEntity
                 .ok(ApiResponse.success(response));
