@@ -5,6 +5,8 @@ import com.taskbuddy.api.controller.request.TaskUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
+import com.taskbuddy.core.domain.TaskCreate;
+import com.taskbuddy.core.domain.TaskUpdate;
 import com.taskbuddy.core.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,8 @@ public class TaskController {
     ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        Task task = taskService.getTask(id);
-        TaskResponse response = TaskResponse.from(task);
+        final Task task = taskService.getTask(id);
+        final TaskResponse response = TaskResponse.from(task);
 
         return ResponseEntity
                 .ok(ApiResponse.success(response));
@@ -32,8 +34,18 @@ public class TaskController {
 
     @PostMapping
     ResponseEntity<ApiResponse<?>> createTask(@RequestBody TaskCreateRequest request) {
-        //Dummy
-        final long createdTaskId = 1L;
+        //FIXME 인증 넣으면 제거하기
+        final Long dummyUserId = 1L;
+
+        final TaskCreate taskCreate = new TaskCreate(
+                dummyUserId,
+                request.title(),
+                request.description(),
+                request.timeFrame().startDateTime(),
+                request.timeFrame().endDateTime()
+        );
+
+        final Long createdTaskId = taskService.createTask(taskCreate);
 
         return ResponseEntity
                 .created(URI.create("localhost:8080/v1/tasks/" + createdTaskId))
@@ -44,23 +56,27 @@ public class TaskController {
     ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        // FIXME 서비스 로직 구현하면 제거하기
-        if (id == 0) {
-            throw new IllegalArgumentException("The given task with id does not exist.");
-        }
+        //FIXME 인증 넣으면 제거하기
+        final Long dummyUserId = 1L;
+
+        TaskUpdate taskUpdate = new TaskUpdate(
+                id,
+                dummyUserId,
+                request.title(),
+                request.description(),
+                request.timeFrame().startDateTime(),
+                request.timeFrame().endDateTime());
+        taskService.updateTask(taskUpdate);
 
         return ResponseEntity
                 .ok(ApiResponse.success());
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<?>> removeTask(@PathVariable("id") Long id) {
+    ResponseEntity<ApiResponse<?>> deleteTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        // FIXME 서비스 로직 구현하면 제거하기
-        if (id == 0) {
-            throw new IllegalArgumentException("The given task with id does not exist.");
-        }
+        taskService.deleteTask(id);
 
         return ResponseEntity
                 .ok(ApiResponse.success());

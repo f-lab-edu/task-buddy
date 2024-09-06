@@ -7,4 +7,7 @@ public record Task(
         Boolean isDone,
         TimeFrame timeFrame
 ) {
+    public static Task from(TaskCreate taskCreate) {
+        return null;
+    }
 }
