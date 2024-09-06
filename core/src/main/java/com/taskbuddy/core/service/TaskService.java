@@ -3,30 +3,18 @@ package com.taskbuddy.core.service;
 import com.taskbuddy.core.domain.Task;
 import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskUpdate;
-import com.taskbuddy.core.domain.TimeFrame;
+import com.taskbuddy.core.service.port.TaskRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
+@RequiredArgsConstructor
 @Service
 public class TaskService {
+    private final TaskRepository taskRepository;
 
     public Task getTask(Long id) {
-//        Task task = taskRepository.findById()
-//                .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
-
-        if (id == 0) {
-            throw new IllegalArgumentException("The given task with id does not exist.");
-        }
-
-        // Dummy
-        return new Task(1L,
-                "알고리즘 문제 풀기",
-                "백준1902...",
-                false,
-                new TimeFrame(
-                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
-                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
     }
 
     public Long createTask(TaskCreate taskCreate) {

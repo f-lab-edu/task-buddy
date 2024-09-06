@@ -11,17 +11,21 @@ public class FakeTaskRepository implements TaskRepository {
     private final Map<Long, Task> data = new HashMap<>();
     private long generatedId;
 
-    public void save(Task task) {
-        if (task.id() == null) {
-            data.put(++generatedId,
-                    new Task(
-                        generatedId,
-                        task.title(),
-                        task.description(),
-                        task.isDone(),
-                        task.timeFrame()));
+    public Task save(Task task) {
+        if (task.getId() == null) {
+            final long id = ++generatedId;
+            Task savedTask = Task.builder()
+                    .id(id)
+                    .title(task.getTitle())
+                    .isDone(task.getIsDone())
+                    .description(task.getDescription())
+                    .timeFrame(task.getTimeFrame())
+                    .build();
+            data.put(id, savedTask);
+            return savedTask;
         } else {
-            data.put(task.id(), task);
+            data.put(task.getId(), task);
+            return task;
         }
     }
 
