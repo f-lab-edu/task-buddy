@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
-import com.taskbuddy.api.controller.request.TaskUpdateRequest;
+import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.response.ResultStatus;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
 import org.junit.jupiter.api.BeforeEach;
@@ -189,7 +189,7 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task내용을_수정할_수_있다() throws Exception {
-        TaskUpdateRequest request = new TaskUpdateRequest(
+        TaskContentUpdateRequest request = new TaskContentUpdateRequest(
                 "알고리즘 문제 풀기",
                 "백준1902..",
                 new TimeFrame(
@@ -229,7 +229,7 @@ public class TaskControllerTest {
 
     @Test
     void 수정할_Task_ID가_음수값이면_실패응답을_받는다() throws Exception {
-        TaskUpdateRequest request = new TaskUpdateRequest(
+        TaskContentUpdateRequest request = new TaskContentUpdateRequest(
                 "알고리즘 문제 풀기",
                 "백준1902..",
                 new TimeFrame(
@@ -281,7 +281,7 @@ public class TaskControllerTest {
 
     @Test
     void 수정할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
-        TaskUpdateRequest request = new TaskUpdateRequest(
+        TaskContentUpdateRequest request = new TaskContentUpdateRequest(
                 "알고리즘 문제 풀기",
                 "백준1902..",
                 new TimeFrame(

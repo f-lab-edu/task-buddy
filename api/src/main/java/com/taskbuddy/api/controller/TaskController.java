@@ -1,7 +1,7 @@
 package com.taskbuddy.api.controller;
 
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
-import com.taskbuddy.api.controller.request.TaskUpdateRequest;
+import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
@@ -52,8 +52,8 @@ public class TaskController {
                 .body(ApiResponse.success());
     }
 
-    @PatchMapping("/{id}")
-    ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskUpdateRequest request) {
+    @PatchMapping("/{id}/content")
+    ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         //FIXME 인증 넣으면 제거하기
