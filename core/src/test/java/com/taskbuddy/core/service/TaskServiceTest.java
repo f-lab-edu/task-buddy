@@ -16,10 +16,14 @@ class TaskServiceTest {
     private TaskService taskService;
     private FakeTaskRepository fakeTaskRepository;
 
+    private LocalDateTime currentDateTime;
+
     @BeforeEach
     void setUp() {
         fakeTaskRepository = new FakeTaskRepository();
-        taskService = new TaskService(fakeTaskRepository);
+        currentDateTime = LocalDateTime.now();
+
+        taskService = new TaskService(fakeTaskRepository, () -> currentDateTime);
     }
 
     @Test

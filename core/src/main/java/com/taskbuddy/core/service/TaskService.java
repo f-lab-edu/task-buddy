@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final ClockHolder clockHolder;
 
     public Task getTask(Long id) {
         return taskRepository.findById(id)
