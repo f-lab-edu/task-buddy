@@ -199,7 +199,7 @@ public class TaskControllerTest {
                         LocalDateTime.of(2024, 8, 31, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
 
-        mockMvc.perform(patch("/v1/tasks/{id}", 1)
+        mockMvc.perform(patch("/v1/tasks/{id}/content", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -239,7 +239,7 @@ public class TaskControllerTest {
                         LocalDateTime.of(2024, 8, 31, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
 
-        mockMvc.perform(patch("/v1/tasks/{id}", -1)
+        mockMvc.perform(patch("/v1/tasks/{id}/content", -1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -267,7 +267,7 @@ public class TaskControllerTest {
                 "  }\n" +
                 "}";
 
-        mockMvc.perform(patch("/v1/tasks/{id}", 1)
+        mockMvc.perform(patch("/v1/tasks/{id}/content", 1)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -291,7 +291,7 @@ public class TaskControllerTest {
                         LocalDateTime.of(2024, 8, 31, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
 
-        mockMvc.perform(patch("/v1/tasks/{id}", 0)
+        mockMvc.perform(patch("/v1/tasks/{id}/content", 0)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)

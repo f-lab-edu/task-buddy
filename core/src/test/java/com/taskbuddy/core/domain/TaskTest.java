@@ -39,7 +39,7 @@ class TaskTest {
     }
 
     @Test
-    void taskUpdate로_Task를_업데이트할_수_있다() {
+    void taskContentUpdate로_Task를_업데이트할_수_있다() {
         //given
         LocalDateTime currentDateTime = LocalDateTime.now();
         TestClockHolder testClockHolder = new TestClockHolder(currentDateTime);
