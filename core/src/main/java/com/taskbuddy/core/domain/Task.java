@@ -1,6 +1,6 @@
 package com.taskbuddy.core.domain;
 
-import com.taskbuddy.core.service.ClockHolder;
+import com.taskbuddy.core.service.port.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.taskbuddy.core.mock;
 
-import com.taskbuddy.core.service.ClockHolder;
+import com.taskbuddy.core.service.port.ClockHolder;
 
 import java.time.LocalDateTime;
 

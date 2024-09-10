@@ -1,5 +1,6 @@
-package com.taskbuddy.core.service;
+package com.taskbuddy.core.config;
 
+import com.taskbuddy.core.service.port.ClockHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

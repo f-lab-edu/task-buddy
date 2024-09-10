@@ -1,4 +1,4 @@
-package com.taskbuddy.core.service;
+package com.taskbuddy.core.service.port;
 
 import java.time.LocalDateTime;
 
