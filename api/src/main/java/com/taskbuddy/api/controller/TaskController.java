@@ -36,7 +36,7 @@ public class TaskController {
 
     @PostMapping
     ResponseEntity<ApiResponse<?>> createTask(@RequestBody TaskCreateRequest request) {
-        //FIXME 인증 넣으면 제거하기
+        //FIXME (#15) 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
         final TaskCreate taskCreate = new TaskCreate(
@@ -58,7 +58,7 @@ public class TaskController {
     ResponseEntity<ApiResponse<?>> updateTaskContent(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        //FIXME 인증 넣으면 제거하기
+        //FIXME (#15) 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
         TaskContentUpdate taskContentUpdate = new TaskContentUpdate(
@@ -78,7 +78,7 @@ public class TaskController {
     ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody TaskDoneUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
-        //FIXME 인증 넣으면 제거하기
+        //FIXME (#15) 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
         TaskDoneUpdate taskDoneUpdate = new TaskDoneUpdate(id, dummyUserId, request.isDone());
