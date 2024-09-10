@@ -2,7 +2,7 @@ package com.taskbuddy.core.domain;
 
 import java.time.LocalDateTime;
 
-public record TaskUpdate(
+public record TaskContentUpdate(
         Long id,
         Long userId,
         String title,

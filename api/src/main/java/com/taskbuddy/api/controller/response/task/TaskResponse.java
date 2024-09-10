@@ -11,13 +11,13 @@ public record TaskResponse (
 ) {
     public static TaskResponse from(final Task task) {
         return new TaskResponse(
-                task.id(),
-                task.title(),
-                task.description(),
-                task.isDone(),
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getIsDone(),
                 new TimeFrame(
-                        task.timeFrame().startDateTime(),
-                        task.timeFrame().endDateTime())
+                        task.getTimeFrame().startDateTime(),
+                        task.getTimeFrame().endDateTime())
         );
     }
 }

@@ -1,7 +1,10 @@
 package com.taskbuddy.core.domain;
 
+import com.taskbuddy.core.service.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class Task {
@@ -10,7 +13,6 @@ public class Task {
     private String title;
     private Boolean isDone;
     private String description;
-    private Boolean isDone;
     private TimeFrame timeFrame;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -38,5 +40,12 @@ public class Task {
                 .createdAt(createdAt)
                 .updatedAt(createdAt)
                 .build();
+    }
+
+    public void update(TaskContentUpdate taskContentUpdate, ClockHolder clockHolder) {
+        title = taskContentUpdate.title();
+        description = taskContentUpdate.description();
+        timeFrame = new TimeFrame(taskContentUpdate.startDateTime(), taskContentUpdate.endDateTime());
+        updatedAt = clockHolder.currentDateTime();
     }
 }

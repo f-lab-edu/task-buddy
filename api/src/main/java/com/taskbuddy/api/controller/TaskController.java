@@ -6,7 +6,7 @@ import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
 import com.taskbuddy.core.domain.TaskCreate;
-import com.taskbuddy.core.domain.TaskUpdate;
+import com.taskbuddy.core.domain.TaskContentUpdate;
 import com.taskbuddy.core.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -59,14 +59,14 @@ public class TaskController {
         //FIXME 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
-        TaskUpdate taskUpdate = new TaskUpdate(
+        TaskContentUpdate taskContentUpdate = new TaskContentUpdate(
                 id,
                 dummyUserId,
                 request.title(),
                 request.description(),
                 request.timeFrame().startDateTime(),
                 request.timeFrame().endDateTime());
-        taskService.updateTask(taskUpdate);
+        taskService.updateContent(taskContentUpdate);
 
         return ResponseEntity
                 .ok(ApiResponse.success());
