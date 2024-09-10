@@ -3,14 +3,18 @@ package com.taskbuddy.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
+import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.response.ResultStatus;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.core.domain.Task;
+import com.taskbuddy.core.service.port.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -22,6 +26,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
@@ -42,6 +49,9 @@ public class TaskControllerTest {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private TaskRepository taskRepository;
+
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -60,7 +70,22 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task_정보를_조회할_수_있다() throws Exception {
-        mockMvc.perform(get("/v1/tasks/{id}", 1L)
+        final long taskId = 1L;
+        Task mockTask = Task.builder()
+                .id(taskId)
+                .title("알고리즘 풀기")
+                .isDone(false)
+                .description("백준1902")
+                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(
+                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)
+                ))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Mockito.when(taskRepository.findById(taskId)).thenReturn(Optional.of(mockTask));
+
+        mockMvc.perform(get("/v1/tasks/{id}", taskId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -123,12 +148,26 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task를_생성할_수_있다() throws Exception {
+        String givenTitle = "알고리즘 문제 풀기";
+        String givenDescription = "백준1902..";
+        LocalDateTime givenStartDateTime = LocalDateTime.of(2024, 8, 1, 0, 0, 0);
+        LocalDateTime givenEndDateTime = LocalDateTime.of(2024, 8, 1, 23, 59, 59);
+
+        Task mockTask = Task.builder()
+                .id(1L)
+                .title(givenTitle)
+                .isDone(false)
+                .description(givenDescription)
+                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(givenStartDateTime, givenEndDateTime))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Mockito.when(taskRepository.save(Mockito.any(Task.class))).thenReturn(mockTask);
+
         TaskCreateRequest request = new TaskCreateRequest(
-                "알고리즘 문제 풀기",
-                "백준1902..",
-                new TimeFrame(
-                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
-                        LocalDateTime.of(2024, 8, 1, 23, 59, 59)));
+                givenTitle,
+                givenDescription,
+                new TimeFrame(givenStartDateTime, givenEndDateTime));
 
         mockMvc.perform(post("/v1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -189,22 +228,37 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task내용을_수정할_수_있다() throws Exception {
-        TaskContentUpdateRequest request = new TaskContentUpdateRequest(
-                "알고리즘 문제 풀기",
-                "백준1902..",
-                new TimeFrame(
-                        LocalDateTime.of(2024, 8, 31, 0, 0, 0),
-                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)));
+        String givenTitle = "알고리즘 문제 풀기";
+        String givenDescription = "백준1902..";
+        LocalDateTime givenStartDateTime = LocalDateTime.of(2024, 8, 1, 0, 0, 0);
+        LocalDateTime givenEndDateTime = LocalDateTime.of(2024, 8, 1, 23, 59, 59);
 
-        mockMvc.perform(patch("/v1/tasks/{id}/content", 1)
+        long givenId = 1L;
+        Task mockTask = Task.builder()
+                .id(givenId)
+                .title(givenTitle)
+                .isDone(false)
+                .description(givenDescription)
+                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(givenStartDateTime, givenEndDateTime))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Mockito.when(taskRepository.findById(givenId)).thenReturn(Optional.of(mockTask));
+
+        TaskContentUpdateRequest request = new TaskContentUpdateRequest(
+                "update title",
+                "update description",
+                new TimeFrame(givenStartDateTime.plusDays(3), givenEndDateTime.plusDays(3)));
+
+        mockMvc.perform(patch("/v1/tasks/{id}/content", givenId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andDo(print())
                 .andDo(document("update-a-task-content/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
@@ -306,15 +360,14 @@ public class TaskControllerTest {
 
     @Test
     void 완료여부를_업데이트할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
-        String json = "{\n" +
-                "  \"isDone\":\"true\"" +
-                "}";
+        Map<String, String> body = new HashMap<>();
+        body.put("isDone", "true");
 
         mockMvc.perform(patch("/v1/tasks/{id}/done", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
-                        .content(objectMapper.writeValueAsString(json)))
+                        .content(objectMapper.writeValueAsString(body)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -328,25 +381,33 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task의_완료여부를_업데이트할_수_있다() throws Exception {
-        //TODO Repository에 데이터 삽입
+        long givenTaskId = 1L;
+        Task task = Task.builder()
+                .id(givenTaskId)
+                .title("알고리즘 풀기")
+                .isDone(false)
+                .description("백준1902")
+                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(
+                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)
+                ))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+        Mockito.when(taskRepository.findById(givenTaskId)).thenReturn(Optional.of(task));
 
-        String json = "{\n" +
-                "  \"isDone\":\"true\"" +
-                "}";
+        Map<String, String> body = new HashMap<>();
+        body.put("isDone", "true");
 
-        mockMvc.perform(patch("/v1/tasks/{id}/done", 1)
+        mockMvc.perform(patch("/v1/tasks/{id}/done", givenTaskId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)
-                        .content(objectMapper.writeValueAsString(json)))
+                        .content(objectMapper.writeValueAsString(body)))
                 .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
-                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
                 .andDo(document("update-a-task-done/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")

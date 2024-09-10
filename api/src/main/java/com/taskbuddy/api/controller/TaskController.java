@@ -2,6 +2,7 @@ package com.taskbuddy.api.controller;
 
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
+import com.taskbuddy.api.controller.request.TaskDoneUpdateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
@@ -74,13 +75,13 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/done")
-    ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody Boolean isDone) {
+    ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody TaskDoneUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         //FIXME 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
-        TaskDoneUpdate taskDoneUpdate = new TaskDoneUpdate(id, dummyUserId, isDone);
+        TaskDoneUpdate taskDoneUpdate = new TaskDoneUpdate(id, dummyUserId, request.isDone());
         taskService.updateDone(taskDoneUpdate);
 
         return ResponseEntity
