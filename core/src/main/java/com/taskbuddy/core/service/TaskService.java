@@ -44,8 +44,12 @@ public class TaskService {
     }
 
     public void deleteTask(Long id) {
-        if (id == 0) {
+        final boolean exists = taskRepository.existsById(id);
+
+        if (!exists) {
             throw new IllegalArgumentException("The given task with id does not exist.");
         }
+
+        taskRepository.deleteById(id);
     }
 }

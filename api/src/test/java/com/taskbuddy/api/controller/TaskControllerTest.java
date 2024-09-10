@@ -424,7 +424,10 @@ public class TaskControllerTest {
 
     @Test
     void 사용자는_Task를_삭제할_수_있다() throws Exception {
-        mockMvc.perform(delete("/v1/tasks/{id}", 1)
+        long givenTaskId = 1L;
+        Mockito.when(taskRepository.existsById(givenTaskId)).thenReturn(true);
+
+        mockMvc.perform(delete("/v1/tasks/{id}", givenTaskId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
@@ -446,7 +449,10 @@ public class TaskControllerTest {
 
     @Test
     void 삭제할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
-        mockMvc.perform(delete("/v1/tasks/{id}", 0)
+        long givenTaskId = 1L;
+        Mockito.when(taskRepository.existsById(givenTaskId)).thenReturn(false);
+
+        mockMvc.perform(delete("/v1/tasks/{id}", givenTaskId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())

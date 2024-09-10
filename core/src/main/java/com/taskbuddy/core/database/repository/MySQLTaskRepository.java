@@ -10,6 +10,11 @@ import java.util.Optional;
 public class MySQLTaskRepository implements TaskRepository {
 
     @Override
+    public boolean existsById(Long id) {
+        return false;
+    }
+
+    @Override
     public Optional<Task> findById(Long id) {
         return Optional.empty();
     }
@@ -17,5 +22,10 @@ public class MySQLTaskRepository implements TaskRepository {
     @Override
     public Task save(Task task) {
         return null;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
     }
 }

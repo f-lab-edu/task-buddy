@@ -16,6 +16,11 @@ public class FakeTaskRepository implements TaskRepository {
     }
 
     @Override
+    public boolean existsById(Long id) {
+        return data.containsKey(id);
+    }
+
+    @Override
     public Optional<Task> findById(Long id) {
         return Optional.ofNullable(data.get(id));
     }
@@ -39,5 +44,10 @@ public class FakeTaskRepository implements TaskRepository {
             data.put(task.getId(), task);
             return task;
         }
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        data.remove(id);
     }
 }

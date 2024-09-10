@@ -5,6 +5,7 @@ import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskContentUpdate;
 import com.taskbuddy.core.domain.TimeFrame;
 import com.taskbuddy.core.mock.FakeTaskRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -105,13 +106,14 @@ class TaskServiceTest {
     }
 
     @Test
-    void TaskUpdate로_Task를_수정할_수_있다() {
+    void TaskUpdate로_Task내용을_수정할_수_있다() {
         //given
         LocalDateTime givenCreatedDateTime = LocalDateTime.now();
+        boolean givenIsDone = false;
         Long givenId = fakeTaskRepository.save(
                 Task.builder()
                         .title("알고리즘 문제 풀기")
-                        .isDone(false)
+                        .isDone(givenIsDone)
                         .description("백준1902")
                         .timeFrame(new TimeFrame(
                                 LocalDateTime.of(2024, 8, 1, 0, 0, 0),
@@ -135,7 +137,7 @@ class TaskServiceTest {
         assertThat(findTask).isNotNull();
         assertThat(findTask.getId()).isEqualTo(givenId);
         assertThat(findTask.getTitle()).isEqualTo(taskContentUpdate.title());
-//        assertThat(findTask.getIsDone()).isEqualTo(taskUpdate.isDone());
+        assertThat(findTask.getIsDone()).isEqualTo(givenIsDone);
         assertThat(findTask.getDescription()).isEqualTo(taskContentUpdate.description());
         assertThat(findTask.getTimeFrame().startDateTime()).isEqualTo(taskContentUpdate.startDateTime());
         assertThat(findTask.getTimeFrame().endDateTime()).isEqualTo(taskContentUpdate.endDateTime());
@@ -146,7 +148,7 @@ class TaskServiceTest {
     @Test
     void Delete할_Id의_Task가_존재하지_않는다면_예외를_던진다() {
         //given
-        long givenId = 0;
+        long givenId = 1;
 
         //when & then
         assertThatThrownBy(() -> taskService.deleteTask(givenId))
@@ -157,9 +159,21 @@ class TaskServiceTest {
     @Test
     void 주어진ID로_Task를_삭제할_수_있다() {
         //given
+        Long givenId = fakeTaskRepository.save(
+                Task.builder()
+                        .title("알고리즘 문제 풀기")
+                        .isDone(false)
+                        .description("백준1902")
+                        .timeFrame(new TimeFrame(
+                                LocalDateTime.of(2024, 8, 1, 0, 0, 0),
+                                LocalDateTime.of(2024, 8, 31, 23, 59, 59)))
+                        .createdAt(LocalDateTime.now())
+                        .build()).getId();
 
         //when
+        Assertions.assertDoesNotThrow(() -> taskService.deleteTask(givenId));
 
         //then
+        assertThat(fakeTaskRepository.existsById(givenId)).isFalse();
     }
 }
