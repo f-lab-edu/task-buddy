@@ -6,8 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+//TODO (#16) API가 정상 실행되도록 하기 위해 임시 생성함. Persistence Layer 구현시 대체될 예정
 @Repository
-public class MySQLTaskRepository implements TaskRepository {
+public class TempTaskRepository implements TaskRepository {
 
     @Override
     public boolean existsById(Long id) {
