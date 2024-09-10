@@ -18,11 +18,11 @@ public class Task {
     private LocalDateTime updatedAt;
 
     @Builder
-    public Task(Long id, String title, String description, Boolean isDone, TimeFrame timeFrame, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Task(Long id, String title, Boolean isDone, String description, TimeFrame timeFrame, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
-        this.description = description;
         this.isDone = isDone;
+        this.description = description;
         this.timeFrame = timeFrame;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -46,6 +46,15 @@ public class Task {
         title = taskContentUpdate.title();
         description = taskContentUpdate.description();
         timeFrame = new TimeFrame(taskContentUpdate.startDateTime(), taskContentUpdate.endDateTime());
+        updatedAt = clockHolder.currentDateTime();
+    }
+
+    public void done(boolean isDone, ClockHolder clockHolder) {
+        if (this.isDone == isDone) {
+            return;
+        }
+
+        this.isDone = isDone;
         updatedAt = clockHolder.currentDateTime();
     }
 }

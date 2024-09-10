@@ -80,4 +80,64 @@ class TaskTest {
         assertThat(task.getCreatedAt()).isEqualTo(createdDateTime);
         assertThat(task.getUpdatedAt()).isEqualTo(currentDateTime);
     }
+
+    @Test
+    void Task_완료여부가_기존값과_업데이트할_값이_같다면_업데이트하지_않고_종료한다() {
+        //given
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        TestClockHolder testClockHolder = new TestClockHolder(currentDateTime);
+
+        boolean givenIsDone = true;
+        LocalDateTime createdDateTime = LocalDateTime.now().minusWeeks(1);
+        Task task = Task.builder()
+                .id(1L)
+                .title("알고리즘 풀기")
+                .isDone(givenIsDone)
+                .description("백준1902")
+                .timeFrame(new TimeFrame(
+                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)
+                ))
+                .createdAt(createdDateTime)
+                .updatedAt(createdDateTime)
+                .build();
+
+        //when
+        task.done(givenIsDone, testClockHolder);
+
+        //then
+        assertThat(task.getIsDone()).isEqualTo(givenIsDone);
+        assertThat(task.getUpdatedAt()).isEqualTo(createdDateTime);
+    }
+
+    @Test
+    void Task_완료여부를_업데이트할_수_있다() {
+        //given
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        TestClockHolder testClockHolder = new TestClockHolder(currentDateTime);
+
+        boolean givenIsDoneForCreate = false;
+        LocalDateTime createdDateTime = LocalDateTime.now().minusWeeks(1);
+        Task task = Task.builder()
+                .id(1L)
+                .title("알고리즘 풀기")
+                .isDone(givenIsDoneForCreate)
+                .description("백준1902")
+                .timeFrame(new TimeFrame(
+                        LocalDateTime.of(2024, 8, 1, 0, 0, 0),
+                        LocalDateTime.of(2024, 8, 31, 23, 59, 59)
+                ))
+                .createdAt(createdDateTime)
+                .updatedAt(createdDateTime)
+                .build();
+
+        boolean givenIsDoneForUpdate = true;
+
+        //when
+        task.done(givenIsDoneForUpdate, testClockHolder);
+
+        //then
+        assertThat(task.getIsDone()).isEqualTo(givenIsDoneForUpdate);
+        assertThat(task.getUpdatedAt()).isEqualTo(currentDateTime);
+    }
 }

@@ -35,9 +35,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//TODO Task ContentUpdate 내용으로 수정 / Task isDone API 반영
-
-
 //TODO (#12) 태그로 테스트 분리
 @SpringBootTest
 @ExtendWith({RestDocumentationExtension.class})
@@ -208,7 +205,7 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value(ResultStatus.SUCCESS.name()))
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andDo(print())
-                .andDo(document("update-a-task/success",
+                .andDo(document("update-a-task-content/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),
@@ -252,7 +249,7 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
                 .andExpect(jsonPath("$.error.message").value("The id value must be positive."))
-                .andDo(document("update-a-task/fail/negative-id-value"));
+                .andDo(document("update-a-task-content/fail/negative-id-value"));
     }
 
     @Test
@@ -279,7 +276,7 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
                 .andExpect(jsonPath("$.error.message").value("The title of task must not be blank."))
-                .andDo(document("update-a-task/fail/invalid-request-data"));
+                .andDo(document("update-a-task-content/fail/invalid-request-data"));
     }
 
     @Test
@@ -304,7 +301,64 @@ public class TaskControllerTest {
                 .andExpect(jsonPath("$.error").exists())
                 .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
                 .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
-                .andDo(document("update-a-task/fail/does-not-exist"));
+                .andDo(document("update-a-task-content/fail/does-not-exist"));
+    }
+
+    @Test
+    void 완료여부를_업데이트할_Task가_존재하지_않는다면_실패응답을_받는다() throws Exception {
+        String json = "{\n" +
+                "  \"isDone\":\"true\"" +
+                "}";
+
+        mockMvc.perform(patch("/v1/tasks/{id}/done", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(objectMapper.writeValueAsString(json)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
+                .andDo(document("update-a-task-done/fail/does-not-exist"));
+    }
+
+    @Test
+    void 사용자는_Task의_완료여부를_업데이트할_수_있다() throws Exception {
+        //TODO Repository에 데이터 삽입
+
+        String json = "{\n" +
+                "  \"isDone\":\"true\"" +
+                "}";
+
+        mockMvc.perform(patch("/v1/tasks/{id}/done", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(objectMapper.writeValueAsString(json)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.status").value(ResultStatus.FAIL.name()))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("INVALID_PARAMETER_STATE"))
+                .andExpect(jsonPath("$.error.message").value("The given task with id does not exist."))
+                .andDo(document("update-a-task-done/success",
+                        pathParameters(
+                                parameterWithName("id").description("task id")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
+                        ),
+                        responseFields(
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
     }
 
     @Test

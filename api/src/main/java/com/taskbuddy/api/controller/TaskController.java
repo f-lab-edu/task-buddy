@@ -1,12 +1,13 @@
 package com.taskbuddy.api.controller;
 
-import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
+import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
-import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskContentUpdate;
+import com.taskbuddy.core.domain.TaskCreate;
+import com.taskbuddy.core.domain.TaskDoneUpdate;
 import com.taskbuddy.core.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +54,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/content")
-    ResponseEntity<ApiResponse<?>> updateTask(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
+    ResponseEntity<ApiResponse<?>> updateTaskContent(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         //FIXME 인증 넣으면 제거하기
@@ -67,6 +68,20 @@ public class TaskController {
                 request.timeFrame().startDateTime(),
                 request.timeFrame().endDateTime());
         taskService.updateContent(taskContentUpdate);
+
+        return ResponseEntity
+                .ok(ApiResponse.success());
+    }
+
+    @PatchMapping("/{id}/done")
+    ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody Boolean isDone) {
+        Assert.state(id >= 0, "The id value must be positive.");
+
+        //FIXME 인증 넣으면 제거하기
+        final Long dummyUserId = 1L;
+
+        TaskDoneUpdate taskDoneUpdate = new TaskDoneUpdate(id, dummyUserId, isDone);
+        taskService.updateDone(taskDoneUpdate);
 
         return ResponseEntity
                 .ok(ApiResponse.success());
