@@ -5,6 +5,7 @@ import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskContentUpdate;
 import com.taskbuddy.core.domain.TimeFrame;
 import com.taskbuddy.core.mock.FakeTaskRepository;
+import com.taskbuddy.core.mock.TestClockHolder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class TaskServiceTest {
         fakeTaskRepository = new FakeTaskRepository();
         currentDateTime = LocalDateTime.now();
 
-        taskService = new TaskService(fakeTaskRepository, () -> currentDateTime);
+        taskService = new TaskService(fakeTaskRepository, new TestClockHolder(currentDateTime));
     }
 
     @Test
