@@ -74,7 +74,7 @@ public class TaskController {
                 .ok(ApiResponse.success());
     }
 
-    @PatchMapping("/{id}/done")
+    @PatchMapping("/{id}/is-done")
     ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody TaskDoneUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
