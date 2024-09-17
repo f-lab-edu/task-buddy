@@ -6,13 +6,13 @@
 `GET` 요청을 사용해서 기존 Task 하나를 조회할 수 있다.
 
 ==== 성공 응답
-operation::get-a-task-with-id/success[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
+operation::v1/tasks/get-a-task-with-id/success[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
 
 ==== Task가 존재하지 않을 경우
-operation::get-a-task-with-id/fail/does-not-exist[snippets='http-request,http-response']
+operation::v1/tasks/get-a-task-with-id/fail/does-not-exist[snippets='http-request,http-response']
 
 ==== 잘못된 형식의 ID로 요청한 경우
-operation::get-a-task-with-id/fail/negative-id-value[snippets='http-request,http-response']
+operation::v1/tasks/get-a-task-with-id/fail/negative-id-value[snippets='http-request,http-response']
 
 
 [[resources-tasks-create]]
@@ -21,38 +21,52 @@ operation::get-a-task-with-id/fail/negative-id-value[snippets='http-request,http
 `POST` 요청을 사용해서 새 Task를 만들 수 있다.
 
 ==== 성공 응답
-operation::create-a-task/success[snippets='request-headers,request-fields,http-request,response-headers,response-fields,http-response']
+operation::v1/tasks/create-a-task/success[snippets='request-headers,request-fields,http-request,response-headers,response-fields,http-response']
 
 ==== Request 조건에 만족하지 않을 경우
-operation::create-a-task/fail/invalid-request-data[snippets='http-request,http-response']
+operation::v1/tasks/create-a-task/fail/invalid-request-data[snippets='http-request,http-response']
+
 
 [[resources-tasks-update]]
-=== 3) Task 수정
+=== 3) Task 내용 수정
 
 `PATCH` 요청을 사용해서 기존 Task를 수정할 수 있다.
 
 ==== 성공 응답
-operation::update-a-task/success[snippets='request-headers,path-parameters,request-fields,http-request,response-headers,response-fields,http-response']
+operation::v1/tasks/update-a-task-content/success[snippets='request-headers,path-parameters,request-fields,http-request,response-headers,response-fields,http-response']
 
 ==== 잘못된 형식의 ID로 요청한 경우
-operation::update-a-task/fail/negative-id-value[snippets='http-request,http-response']
+operation::v1/tasks/update-a-task-content/fail/negative-id-value[snippets='http-request,http-response']
 
 ==== Request 조건에 만족하지 않을 경우
-operation::update-a-task/fail/invalid-request-data[snippets='http-request,http-response']
+operation::v1/tasks/update-a-task-content/fail/invalid-request-data[snippets='http-request,http-response']
 
 ==== Task가 존재하지 않을 경우
-operation::update-a-task/fail/does-not-exist[snippets='http-request,http-response']
+operation::v1/tasks/update-a-task-content/fail/does-not-exist[snippets='http-request,http-response']
+
+
+[[resources-tasks-update]]
+=== 4) Task 완료여부 업데이트
+
+`PATCH` 요청을 사용해서 기존 Task를 수정할 수 있다.
+
+==== 성공 응답
+operation::v1/tasks/update-a-task-done/success[snippets='request-headers,path-parameters,request-fields,http-request,response-headers,response-fields,http-response']
+
+==== Task가 존재하지 않을 경우
+operation::v1/tasks/update-a-task-done/fail/does-not-exist[snippets='http-request,http-response']
+
 
 [[resources-tasks-remove]]
-=== 4) Task 삭제
+=== 5) Task 삭제
 
 `DELETE` 요청을 사용해서 기존 Task를 수정할 수 있다.
 
 ==== 성공 응답
-operation::remove-a-task/success[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
+operation::v1/tasks/remove-a-task/success[snippets='request-headers,path-parameters,http-request,response-headers,response-fields,http-response']
 
 ==== 잘못된 형식의 ID로 요청한 경우
-operation::remove-a-task/fail/negative-id-value[snippets='http-request,http-response']
+operation::v1/tasks/remove-a-task/fail/negative-id-value[snippets='http-request,http-response']
 
 ==== Task가 존재하지 않을 경우
-operation::remove-a-task/fail/does-not-exist[snippets='http-request,http-response']
+operation::v1/tasks/remove-a-task/fail/does-not-exist[snippets='http-request,http-response']
