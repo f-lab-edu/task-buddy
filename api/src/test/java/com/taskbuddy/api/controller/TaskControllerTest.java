@@ -378,7 +378,7 @@ public class TaskControllerTest {
         body.put("isDone", "true");
 
         webTestClient.patch()
-                .uri("/v1/tasks/{id}/done", 1)
+                .uri("/v1/tasks/{id}/is-done", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(body))
@@ -415,7 +415,7 @@ public class TaskControllerTest {
         body.put("isDone", true);
 
         webTestClient.patch()
-                .uri("/v1/tasks/{id}/done", givenTaskId)
+                .uri("/v1/tasks/{id}/is-done", givenTaskId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(body))
