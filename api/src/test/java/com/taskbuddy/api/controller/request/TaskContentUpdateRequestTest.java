@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TaskUpdateRequestTest {
+class TaskContentUpdateRequestTest {
     @ParameterizedTest
     @NullAndEmptySource
     void Title이_Null이거나_비어있는_값이면_예외를_던진다(String emptyTitle) {
@@ -18,7 +18,7 @@ class TaskUpdateRequestTest {
         TimeFrame dummyTimeFrame = new TimeFrame(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
 
         //when & then
-        assertThatThrownBy(() -> new TaskUpdateRequest(emptyTitle, null, dummyTimeFrame))
+        assertThatThrownBy(() -> new TaskContentUpdateRequest(emptyTitle, null, dummyTimeFrame))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("The title of task must not be blank.");
     }
@@ -30,7 +30,7 @@ class TaskUpdateRequestTest {
         TimeFrame dummyTimeFrame = new TimeFrame(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
 
         //when & then
-        assertThatThrownBy(() -> new TaskUpdateRequest("sample title", longDescription, dummyTimeFrame))
+        assertThatThrownBy(() -> new TaskContentUpdateRequest("sample title", longDescription, dummyTimeFrame))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("The description length must be equal or less than 500");
     }
@@ -42,13 +42,13 @@ class TaskUpdateRequestTest {
         TimeFrame dummyTimeFrame = new TimeFrame(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
 
         //when & then
-        assertDoesNotThrow(() -> new TaskUpdateRequest("sample title", longDescription, dummyTimeFrame));
+        assertDoesNotThrow(() -> new TaskContentUpdateRequest("sample title", longDescription, dummyTimeFrame));
     }
 
     @Test
     void timeFrame이_null이라면_예외를_던진다() {
         //given & when & then
-        assertThatThrownBy(() -> new TaskUpdateRequest("sample title", null, null))
+        assertThatThrownBy(() -> new TaskContentUpdateRequest("sample title", null, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The timeFrame must not be null.");
     }
@@ -59,6 +59,6 @@ class TaskUpdateRequestTest {
         TimeFrame mockTimeFrame = new TimeFrame(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
 
         //when & then
-        assertDoesNotThrow(() -> new TaskUpdateRequest("sample title", null, mockTimeFrame));
+        assertDoesNotThrow(() -> new TaskContentUpdateRequest("sample title", null, mockTimeFrame));
     }
 }
