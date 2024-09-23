@@ -1,3 +1,6 @@
 spring:
-  application:
-    name: api
+  profiles:
+    active: local
+    group:
+      local:
+        - storage
