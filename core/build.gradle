@@ -24,10 +24,11 @@ dependencyManagement {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.3'
     testImplementation 'org.mockito:mockito-core:5.12.0'
     testImplementation 'org.assertj:assertj-core:3.24.2'
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 test {
