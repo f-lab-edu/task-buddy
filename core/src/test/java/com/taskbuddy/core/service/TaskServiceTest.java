@@ -105,6 +105,7 @@ class TaskServiceTest {
         //then
         assertThat(result).isNotNull();
         assertThat(result).isGreaterThan(0);
+        Mockito.verify(taskRepository, Mockito.times(1)).save(Mockito.any(Task.class));
     }
 
     @Test
@@ -123,6 +124,7 @@ class TaskServiceTest {
         assertThatThrownBy(() -> taskService.updateContent(taskContentUpdate))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The given task with id does not exist.");
+        Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
     }
 
     @Test
@@ -165,6 +167,7 @@ class TaskServiceTest {
         assertThat(findTask.getTimeFrame().endDateTime()).isEqualTo(taskContentUpdate.endDateTime());
         assertThat(findTask.getCreatedAt()).isEqualTo(givenCreatedDateTime);
         assertThat(findTask.getUpdatedAt()).isEqualTo(currentDateTime);
+        Mockito.verify(taskRepository, Mockito.times(1)).save(Mockito.any(Task.class));
     }
 
     @Test
@@ -177,6 +180,7 @@ class TaskServiceTest {
         assertThatThrownBy(() -> taskService.deleteTask(givenId))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The given task with id does not exist.");
+        Mockito.verify(taskRepository, Mockito.never()).deleteById(givenId);
     }
 
     @Test
@@ -189,6 +193,6 @@ class TaskServiceTest {
         Assertions.assertDoesNotThrow(() -> taskService.deleteTask(givenId));
 
         //then
-        Mockito.verify(taskRepository).deleteById(givenId);
+        Mockito.verify(taskRepository, Mockito.times(1)).deleteById(givenId);
     }
 }
