@@ -70,6 +70,7 @@ public class TaskController {
                 request.title(),
                 request.description(),
                 true,
+                Duration.ofMinutes(10),
                 request.timeFrame().startDateTime(),
                 request.timeFrame().endDateTime());
         taskService.updateContent(taskContentUpdate);

@@ -133,7 +133,7 @@ class TaskServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The given task with id does not exist.");
         Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
-
+        Mockito.verify(reminderSettingsService, Mockito.never()).initialize(Mockito.any(Task.class), Mockito.any());
     }
 
     @Test

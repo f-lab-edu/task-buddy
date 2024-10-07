@@ -22,12 +22,13 @@ public class ReminderSettingsService {
                 .orElseThrow(() -> new IllegalArgumentException("Task Settings with given task id does not exist."));
     }
 
+
     public void initialize(Task task, Duration reminderInterval) {
         if (!task.isReminderEnabled()) {
             return;
         }
 
-        ReminderSettings reminderSettings = ReminderSettings.from(task, reminderInterval);
+        ReminderSettings reminderSettings = ReminderSettings.from(task, reminderInterval, clockHolder);
         reminderSettingsRepository.save(reminderSettings);
     }
 
@@ -56,6 +57,5 @@ public class ReminderSettingsService {
     public void deleteByTaskId(Long taskId) {
         reminderSettingsRepository.findByTaskId(taskId)
                 .ifPresent(reminderSettings -> reminderSettingsRepository.deleteById(reminderSettings.getId()));
-
     }
 }
