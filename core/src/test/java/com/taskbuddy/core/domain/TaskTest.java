@@ -3,6 +3,7 @@ package com.taskbuddy.core.domain;
 import com.taskbuddy.core.mock.TestClockHolder;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +20,8 @@ class TaskTest {
                 1L,
                 "알고리즘 풀기",
                 "백준1902",
+                true,
+                Duration.ofMinutes(10),
                 LocalDateTime.of(2024, 8, 1, 0, 0, 0),
                 LocalDateTime.of(2024, 8, 31, 23, 59, 59));
 
@@ -64,6 +67,8 @@ class TaskTest {
                 1L,
                 "알고리즘 풀기",
                 "백준2630",
+                true,
+                Duration.ofMinutes(10),
                 LocalDateTime.of(2024, 9, 1, 0, 0, 0),
                 LocalDateTime.of(2024, 9, 30, 23, 59, 59));
 

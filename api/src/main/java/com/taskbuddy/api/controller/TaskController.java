@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.Duration;
 
 @RequiredArgsConstructor
 @RequestMapping("/v1/tasks")
@@ -43,6 +44,8 @@ public class TaskController {
                 dummyUserId,
                 request.title(),
                 request.description(),
+                true,
+                Duration.ofMinutes(10),
                 request.timeFrame().startDateTime(),
                 request.timeFrame().endDateTime()
         );
@@ -66,6 +69,8 @@ public class TaskController {
                 dummyUserId,
                 request.title(),
                 request.description(),
+                true,
+                Duration.ofMinutes(10),
                 request.timeFrame().startDateTime(),
                 request.timeFrame().endDateTime());
         taskService.updateContent(taskContentUpdate);

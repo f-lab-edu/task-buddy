@@ -9,21 +9,24 @@ import java.time.LocalDateTime;
 @Getter
 public class Task {
     private final Long id;
-//    private User user;
+    private User user;
     private String title;
     private Boolean isDone;
     private String description;
     private TimeFrame timeFrame;
+    private boolean reminderEnabled;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public Task(Long id, String title, Boolean isDone, String description, TimeFrame timeFrame, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Task(Long id, User user, String title, Boolean isDone, String description, TimeFrame timeFrame, boolean reminderEnabled, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.user = user;
         this.title = title;
         this.isDone = isDone;
         this.description = description;
         this.timeFrame = timeFrame;
+        this.reminderEnabled = reminderEnabled;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -37,6 +40,7 @@ public class Task {
                 .isDone(isDoneDefaultValue)
                 .description(taskCreate.description())
                 .timeFrame(new TimeFrame(taskCreate.startDateTime(), taskCreate.endDateTime()))
+                .reminderEnabled(taskCreate.reminderEnabled())
                 .createdAt(createdAt)
                 .updatedAt(createdAt)
                 .build();
@@ -46,6 +50,7 @@ public class Task {
         title = taskContentUpdate.title();
         description = taskContentUpdate.description();
         timeFrame = new TimeFrame(taskContentUpdate.startDateTime(), taskContentUpdate.endDateTime());
+        reminderEnabled = taskContentUpdate.reminderEnabled();
         updatedAt = clockHolder.currentDateTime();
     }
 
