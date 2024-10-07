@@ -8,11 +8,13 @@ import com.taskbuddy.core.service.port.ClockHolder;
 import com.taskbuddy.core.service.port.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final ReminderSettingsService reminderSettingsService;
     private final ClockHolder clockHolder;
 
     public Task getTask(Long id) {
@@ -20,19 +22,25 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
     }
 
+    @Transactional
     public Long createTask(TaskCreate taskCreate) {
-        final Task task = Task.from(taskCreate, clockHolder);
-        final Task savedTask = taskRepository.save(task);
+        Task task = Task.from(taskCreate, clockHolder);
+        task = taskRepository.save(task);
 
-        return savedTask.getId();
+        reminderSettingsService.initialize(task, taskCreate.reminderInterval());
+
+        return task.getId();
     }
 
+    @Transactional
     public void updateContent(TaskContentUpdate taskContentUpdate) {
         Task task = taskRepository.findById(taskContentUpdate.id())
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
 
         task.update(taskContentUpdate, clockHolder);
         taskRepository.save(task);
+
+        reminderSettingsService.update(task, taskContentUpdate.reminderInterval());
     }
 
     public void updateDone(TaskDoneUpdate taskDoneUpdate) {
@@ -51,5 +59,6 @@ public class TaskService {
         }
 
         taskRepository.deleteById(id);
+        reminderSettingsService.deleteByTaskId(id);
     }
 }
