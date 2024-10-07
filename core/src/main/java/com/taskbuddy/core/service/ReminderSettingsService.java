@@ -22,7 +22,6 @@ public class ReminderSettingsService {
                 .orElseThrow(() -> new IllegalArgumentException("Task Settings with given task id does not exist."));
     }
 
-
     public void initialize(Task task, Duration reminderInterval) {
         if (!task.isReminderEnabled()) {
             return;
