@@ -118,6 +118,7 @@ class TaskServiceTest {
                 1L,
                 "알고리즘 문제 풀기",
                 "백준4300",
+                true,
                 LocalDateTime.of(2024, 9, 1, 0, 0, 0),
                 LocalDateTime.of(2024, 9, 10, 23, 59, 59));
 
