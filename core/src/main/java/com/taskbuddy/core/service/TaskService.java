@@ -43,6 +43,7 @@ public class TaskService {
         reminderSettingsService.update(task, taskContentUpdate.reminderInterval());
     }
 
+
     public void updateDone(TaskDoneUpdate taskDoneUpdate) {
         Task task = taskRepository.findById(taskDoneUpdate.id())
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
@@ -51,6 +52,7 @@ public class TaskService {
         taskRepository.save(task);
     }
 
+    @Transactional
     public void deleteTask(Long id) {
         final boolean exists = taskRepository.existsById(id);
 
