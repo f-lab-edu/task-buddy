@@ -7,6 +7,7 @@ public record TaskContentUpdate(
         Long userId,
         String title,
         String description,
+        Boolean reminderEnabled,
         LocalDateTime startDateTime,
         LocalDateTime endDateTime
 ) {}
