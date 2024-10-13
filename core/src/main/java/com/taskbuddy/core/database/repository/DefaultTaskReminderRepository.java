@@ -1,21 +1,21 @@
 package com.taskbuddy.core.database.repository;
 
-import com.taskbuddy.core.domain.ReminderSettings;
+import com.taskbuddy.core.domain.TaskReminder;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 //임시생성
 @Repository
-public class DefaultReminderSettingsRepository implements ReminderSettingsRepository {
+public class DefaultTaskReminderRepository implements TaskReminderRepository {
 
     @Override
-    public Optional<ReminderSettings> findByTaskId(Long taskId) {
+    public Optional<TaskReminder> findByTaskId(Long taskId) {
         return Optional.empty();
     }
 
     @Override
-    public void save(ReminderSettings reminderSettings) {
+    public void save(TaskReminder taskReminder) {
 
     }
 
