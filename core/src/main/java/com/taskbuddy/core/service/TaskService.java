@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskReminderService taskReminderService;
+    private final TaskReminderWriteService taskReminderWriteService;
     private final ClockHolder clockHolder;
 
     public Task getTask(Long id) {
@@ -35,7 +35,7 @@ public class TaskService {
         Task task = Task.from(taskCreate, clockHolder);
         task = taskRepository.save(task);
 
-        taskReminderService.initialize(task, taskCreate.reminderInterval());
+        taskReminderWriteService.initialize(task, taskCreate.reminderInterval());
 
         return task.getId();
     }
@@ -48,7 +48,7 @@ public class TaskService {
         task.update(taskContentUpdate, clockHolder);
         taskRepository.save(task);
 
-        taskReminderService.update(task, taskContentUpdate.reminderInterval());
+        taskReminderWriteService.update(task, taskContentUpdate.reminderInterval());
     }
 
 
@@ -69,6 +69,6 @@ public class TaskService {
         }
 
         taskRepository.deleteById(id);
-        taskReminderService.deleteByTaskId(id);
+        taskReminderWriteService.deleteByTaskId(id);
     }
 }

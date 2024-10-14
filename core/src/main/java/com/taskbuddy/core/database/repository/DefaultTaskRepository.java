@@ -28,7 +28,12 @@ public class DefaultTaskRepository implements TaskRepository {
 
     @Override
     public List<Task> findAllInTimeFrameAndReminderEnabled(boolean isReminderEnabled, LocalDateTime dateTime) {
-        return null;
+        return taskJpaRepository.findAll().stream()
+                .map(TaskEntity::toModel)
+                .filter(task -> task.isReminderEnabled() &&
+                        dateTime.isAfter(task.getTimeFrame().startDateTime()) &&
+                        dateTime.isBefore(task.getTimeFrame().endDateTime()))
+                .toList();
     }
 
     @Override
