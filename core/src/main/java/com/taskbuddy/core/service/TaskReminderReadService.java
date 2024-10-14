@@ -22,18 +22,15 @@ public class TaskReminderReadService {
     private final ClockHolder clockHolder;
 
     public List<TaskReminder> getAllToSendReminder() {
-        // 1. 시작일시가 지난 진행중인 (그리고 reminder enabled가 true인) Task 목록 조회
         final List<Task> tasks = taskService.findCurrentTasksWithReminderEnabled();
 
         if (tasks.isEmpty()) {
             return Collections.emptyList();
         }
 
-        // 2. 유저상태가 작업중인지 확인 및 리마인더 설정을 켜놨는지 확인
         final Set<Long> userIds = userService.filterUserIdsWithOnTask(mappedTasks(tasks, Task::getUserId));
         tasks.removeIf(task -> userIds.contains(task.getUserId()));
 
-        // 3. 현재시간이 인터벌 시간이 맞는가?
         return taskReminderRepository.findAllInTaskIds(mappedTasks(tasks, Task::getId))
                 .stream()
                 .filter(taskReminder -> taskReminder.isReminderDue(clockHolder))
