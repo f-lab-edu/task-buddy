@@ -25,8 +25,6 @@ public class TaskService {
     }
 
     public List<Task> findCurrentTasksWithReminderEnabled() {
-        // TODO datetime으로 검색하면 fullscan을 하려나? 기간 검색만 한다면? enabled 가 추가되니까 인덱스 추가하기
-        // TODO Test는 어떻게 하지? 이건 안해도 되는건가? 진행중이고 reminderEnabled가 true인 Task 목록 조회 테스트
         return taskRepository.findAllInTimeFrameAndReminderEnabled(true, clockHolder.currentDateTime());
     }
 
