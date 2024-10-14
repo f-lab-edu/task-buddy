@@ -87,7 +87,7 @@ class TaskReminderReadServiceTest {
     }
 
     @Test
-    void 유저가_접속중이지_않은_Task는_Reminder_Task_목록에_포함되지_않는다() {
+    void 유저가_이미_작업중상태인_Task는_Reminder_Task_목록에_포함되지_않는다() {
         //given
         Task mockTask1 = mock(Task.class);
         when(mockTask1.getId()).thenReturn(1L);
