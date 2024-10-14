@@ -44,13 +44,13 @@ public class TaskReminder {
 
     public boolean isReminderDue(ClockHolder clockHolder) {
         LocalDateTime currentDateTime = clockHolder.currentDateTime();
-        LocalDateTime taskStartDateTime = task.getTimeFrame().startDateTime();
+        TimeFrame timeFrame = task.getTimeFrame();
 
-        if (currentDateTime.isBefore(taskStartDateTime)) {
+        if (currentDateTime.isBefore(timeFrame.startDateTime()) || currentDateTime.isAfter(timeFrame.endDateTime())) {
             return false;
         }
 
-        Duration timeSinceStart = Duration.between(taskStartDateTime, currentDateTime);
+        Duration timeSinceStart = Duration.between(timeFrame.startDateTime(), currentDateTime);
 
         return timeSinceStart.toMinutes() % reminderInterval.toMinutes() == 0;
     }

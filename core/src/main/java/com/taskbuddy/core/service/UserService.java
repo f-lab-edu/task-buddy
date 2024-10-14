@@ -1,13 +1,14 @@
 package com.taskbuddy.core.service;
 
-import com.taskbuddy.core.domain.User;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 @Service
 public class UserService {
 
-    //임시 구현
-    public boolean isUserLoggedIn(User user) {
-        return user.isLoggedIn();
+    public Set<Long> filterUserIdsWithDisconnected(Set<Long> userIds) {
+
+        return null;
     }
 }

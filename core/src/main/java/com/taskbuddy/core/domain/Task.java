@@ -62,4 +62,8 @@ public class Task {
         this.isDone = isDone;
         updatedAt = clockHolder.currentDateTime();
     }
+
+    public Long getUserId() {
+        return user.getId();
+    }
 }

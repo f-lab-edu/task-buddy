@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,18 @@ class TaskServiceTest {
         currentDateTime = LocalDateTime.now();
 
         taskService = new TaskService(taskRepository, taskReminderService, new TestClockHolder(currentDateTime));
+    }
+
+    @Test
+    void findCurrentTasksWithReminderEnabled_Task의_TimeFrame기간안에_포함되고_enabledReminder가_true인_Task는_반환List에_포함된다() {
+        //given
+        Mockito.when(taskRepository.findAllInTimeFrameAndReminderEnabled(true, currentDateTime)).thenReturn(Collections.emptyList());
+
+        //when
+        taskService.findCurrentTasksWithReminderEnabled();
+
+        //then
+        Mockito.verify(taskRepository.findAllInTimeFrameAndReminderEnabled(true, currentDateTime), Mockito.times(1));
     }
 
     @Test
