@@ -1,4 +1,4 @@
-package com.taskbuddy.core.domain;
+package com.taskbuddy.core.domain.user;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +11,7 @@ public class User {
     private Long id;
     private boolean loggedIn;
     private boolean reminderEnabled;
+    private UserStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
