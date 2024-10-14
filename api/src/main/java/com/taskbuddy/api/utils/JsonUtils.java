@@ -1,4 +1,4 @@
-package com.taskbuddy.core.utils;
+package com.taskbuddy.api.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

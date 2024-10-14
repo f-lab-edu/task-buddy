@@ -2,7 +2,7 @@ package com.taskbuddy.scheduler;
 
 import com.taskbuddy.core.domain.TaskReminder;
 import com.taskbuddy.core.service.TaskReminderReadService;
-import com.taskbuddy.core.utils.JsonUtils;
+import com.taskbuddy.api.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
