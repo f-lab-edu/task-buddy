@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 public class User {
     private Long id;
-    private boolean loggedIn;
     private boolean reminderEnabled;
     private UserStatus status;
     private LocalDateTime createdAt;
