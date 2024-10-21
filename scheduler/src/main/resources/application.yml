@@ -17,7 +17,7 @@ spring:
       org:
         quartz:
           jobStore:
-            class: org.quartz.impl.jdbcjobstore.JobStoreTX  # JDBCJobStore 트랜잭션 지원
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
             useProperties: false
             tablePrefix: QRTZ_
