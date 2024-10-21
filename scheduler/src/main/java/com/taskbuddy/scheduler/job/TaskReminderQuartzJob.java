@@ -1,13 +1,14 @@
-package com.taskbuddy.scheduler;
+package com.taskbuddy.scheduler.job;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
 import org.springframework.http.*;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,13 +17,14 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class TaskReminderScheduler {
+public class TaskReminderQuartzJob implements Job {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Scheduled(cron = "0/5 * * * * ?")
-    public void execute() throws JsonProcessingException {
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) {
+        log.info("TaskReminderNotificationJob.execute");
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
@@ -38,10 +40,14 @@ public class TaskReminderScheduler {
             return;
         }
 
-        List<String> allRemindersToSend = objectMapper.readValue(body, new TypeReference<>() {});
+        try {
+            List<String> allRemindersToSend = objectMapper.readValue(body, new TypeReference<>() {});
 
-        for (String message : allRemindersToSend) {
-            kafkaTemplate.send("task-reminders", objectMapper.writeValueAsString(message));
+            for (String message : allRemindersToSend) {
+                kafkaTemplate.send("task-reminders", objectMapper.writeValueAsString(message));
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 }
