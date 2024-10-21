@@ -4,3 +4,4 @@ spring:
     group:
       local:
         - storage
+        - queue

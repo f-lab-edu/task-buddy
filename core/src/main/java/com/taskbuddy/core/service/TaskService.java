@@ -1,8 +1,8 @@
 package com.taskbuddy.core.service;
 
 import com.taskbuddy.core.domain.Task;
-import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskContentUpdate;
+import com.taskbuddy.core.domain.TaskCreate;
 import com.taskbuddy.core.domain.TaskDoneUpdate;
 import com.taskbuddy.core.service.port.ClockHolder;
 import com.taskbuddy.core.service.port.TaskRepository;
@@ -10,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final ReminderSettingsService reminderSettingsService;
+    private final TaskReminderWriteService taskReminderWriteService;
     private final ClockHolder clockHolder;
 
     public Task getTask(Long id) {
@@ -22,12 +24,16 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
     }
 
+    public List<Task> findCurrentTasksWithReminderEnabled() {
+        return taskRepository.findAllInTimeFrameAndReminderEnabled(true, clockHolder.currentDateTime());
+    }
+
     @Transactional
     public Long createTask(TaskCreate taskCreate) {
         Task task = Task.from(taskCreate, clockHolder);
         task = taskRepository.save(task);
 
-        reminderSettingsService.initialize(task, taskCreate.reminderInterval());
+        taskReminderWriteService.initialize(task, taskCreate.reminderInterval());
 
         return task.getId();
     }
@@ -40,7 +46,7 @@ public class TaskService {
         task.update(taskContentUpdate, clockHolder);
         taskRepository.save(task);
 
-        reminderSettingsService.update(task, taskContentUpdate.reminderInterval());
+        taskReminderWriteService.update(task, taskContentUpdate.reminderInterval());
     }
 
 
@@ -61,6 +67,6 @@ public class TaskService {
         }
 
         taskRepository.deleteById(id);
-        reminderSettingsService.deleteByTaskId(id);
+        taskReminderWriteService.deleteByTaskId(id);
     }
 }

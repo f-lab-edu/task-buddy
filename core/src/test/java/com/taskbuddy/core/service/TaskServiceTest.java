@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,16 +22,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class TaskServiceTest {
     private TaskService taskService;
     private TaskRepository taskRepository;
-    private ReminderSettingsService reminderSettingsService;
+    private TaskReminderWriteService taskReminderWriteService;
     private LocalDateTime currentDateTime;
 
     @BeforeEach
     void setUp() {
         taskRepository = Mockito.mock(TaskRepository.class);
-        reminderSettingsService = Mockito.mock(ReminderSettingsService.class);
+        taskReminderWriteService = Mockito.mock(TaskReminderWriteService.class);
         currentDateTime = LocalDateTime.now();
 
-        taskService = new TaskService(taskRepository, reminderSettingsService, new TestClockHolder(currentDateTime));
+        taskService = new TaskService(taskRepository, taskReminderWriteService, new TestClockHolder(currentDateTime));
+    }
+
+    @Test
+    void findCurrentTasksWithReminderEnabled_Task의_TimeFrame기간안에_포함되고_enabledReminder가_true인_Task는_반환List에_포함된다() {
+        //given
+        Mockito.when(taskRepository.findAllInTimeFrameAndReminderEnabled(true, currentDateTime)).thenReturn(Collections.emptyList());
+
+        //when
+        taskService.findCurrentTasksWithReminderEnabled();
+
+        //then
+        Mockito.verify(taskRepository.findAllInTimeFrameAndReminderEnabled(true, currentDateTime), Mockito.times(1));
     }
 
     @Test
@@ -102,7 +115,7 @@ class TaskServiceTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
         Mockito.when(taskRepository.save(Mockito.any())).thenReturn(mockTask);
-        Mockito.doNothing().when(reminderSettingsService).initialize(Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(taskReminderWriteService).initialize(Mockito.any(), Mockito.any());
 
         //when
         Long result = taskService.createTask(taskCreate);
@@ -111,7 +124,7 @@ class TaskServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).isGreaterThan(0);
         Mockito.verify(taskRepository, Mockito.times(1)).save(Mockito.any(Task.class));
-        Mockito.verify(reminderSettingsService, Mockito.times(1)).initialize(Mockito.any(Task.class), Mockito.any());
+        Mockito.verify(taskReminderWriteService, Mockito.times(1)).initialize(Mockito.any(Task.class), Mockito.any());
     }
 
     @Test
@@ -133,7 +146,7 @@ class TaskServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The given task with id does not exist.");
         Mockito.verify(taskRepository, Mockito.never()).save(Mockito.any(Task.class));
-        Mockito.verify(reminderSettingsService, Mockito.never()).initialize(Mockito.any(Task.class), Mockito.any());
+        Mockito.verify(taskReminderWriteService, Mockito.never()).initialize(Mockito.any(Task.class), Mockito.any());
     }
 
     @Test
@@ -153,7 +166,7 @@ class TaskServiceTest {
                 .createdAt(givenCreatedDateTime)
                 .build();
         Mockito.when(taskRepository.findById(givenId)).thenReturn(Optional.of(mockTask));
-        Mockito.doNothing().when(reminderSettingsService).initialize(Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(taskReminderWriteService).initialize(Mockito.any(), Mockito.any());
 
         TaskContentUpdate taskContentUpdate = new TaskContentUpdate(
                 givenId,
@@ -180,7 +193,7 @@ class TaskServiceTest {
         assertThat(findTask.getCreatedAt()).isEqualTo(givenCreatedDateTime);
         assertThat(findTask.getUpdatedAt()).isEqualTo(currentDateTime);
         Mockito.verify(taskRepository, Mockito.times(1)).save(Mockito.any(Task.class));
-        Mockito.verify(reminderSettingsService, Mockito.times(1)).update(Mockito.any(Task.class), Mockito.any());
+        Mockito.verify(taskReminderWriteService, Mockito.times(1)).update(Mockito.any(Task.class), Mockito.any());
     }
 
     @Test
@@ -194,7 +207,7 @@ class TaskServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The given task with id does not exist.");
         Mockito.verify(taskRepository, Mockito.never()).deleteById(givenId);
-        Mockito.verify(reminderSettingsService, Mockito.never()).deleteByTaskId(givenId);
+        Mockito.verify(taskReminderWriteService, Mockito.never()).deleteByTaskId(givenId);
     }
 
     @Test
@@ -202,13 +215,13 @@ class TaskServiceTest {
         //given
         Long givenId = 1L;
         Mockito.when(taskRepository.existsById(givenId)).thenReturn(true);
-        Mockito.doNothing().when(reminderSettingsService).deleteByTaskId(givenId);
+        Mockito.doNothing().when(taskReminderWriteService).deleteByTaskId(givenId);
 
         //when
         Assertions.assertDoesNotThrow(() -> taskService.deleteTask(givenId));
 
         //then
         Mockito.verify(taskRepository, Mockito.times(1)).deleteById(givenId);
-        Mockito.verify(reminderSettingsService, Mockito.times(1)).deleteByTaskId(givenId);
+        Mockito.verify(taskReminderWriteService, Mockito.times(1)).deleteByTaskId(givenId);
     }
 }

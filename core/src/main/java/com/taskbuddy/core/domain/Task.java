@@ -1,5 +1,6 @@
 package com.taskbuddy.core.domain;
 
+import com.taskbuddy.core.domain.user.User;
 import com.taskbuddy.core.service.port.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Task {
     private final Long id;
-    private User user;
+    private final User user;
     private String title;
     private Boolean isDone;
     private String description;
@@ -61,5 +62,9 @@ public class Task {
 
         this.isDone = isDone;
         updatedAt = clockHolder.currentDateTime();
+    }
+
+    public Long getUserId() {
+        return user.getId();
     }
 }

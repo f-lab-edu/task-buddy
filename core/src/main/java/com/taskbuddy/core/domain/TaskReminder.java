@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
-public class ReminderSettings {
+public class TaskReminder {
     private final Long id;
     private final Task task;
     private LocalDateTime lastReminderSentTime;
@@ -17,7 +17,7 @@ public class ReminderSettings {
     private LocalDateTime updatedAt;
 
     @Builder
-    public ReminderSettings(Long id, Task task, LocalDateTime lastReminderSentTime, Duration reminderInterval, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public TaskReminder(Long id, Task task, LocalDateTime lastReminderSentTime, Duration reminderInterval, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.task = task;
         this.lastReminderSentTime = lastReminderSentTime;
@@ -26,10 +26,10 @@ public class ReminderSettings {
         this.updatedAt = updatedAt;
     }
 
-    public static ReminderSettings from(Task task, Duration reminderInterval, ClockHolder clockHolder) {
+    public static TaskReminder from(Task task, Duration reminderInterval, ClockHolder clockHolder) {
         final LocalDateTime currentDateTime = clockHolder.currentDateTime();
 
-        return ReminderSettings.builder()
+        return TaskReminder.builder()
                 .task(task)
                 .reminderInterval(reminderInterval)
                 .createdAt(currentDateTime)
@@ -44,13 +44,13 @@ public class ReminderSettings {
 
     public boolean isReminderDue(ClockHolder clockHolder) {
         LocalDateTime currentDateTime = clockHolder.currentDateTime();
-        LocalDateTime taskStartDateTime = task.getTimeFrame().startDateTime();
+        TimeFrame timeFrame = task.getTimeFrame();
 
-        if (currentDateTime.isBefore(taskStartDateTime)) {
+        if (currentDateTime.isBefore(timeFrame.startDateTime()) || currentDateTime.isAfter(timeFrame.endDateTime())) {
             return false;
         }
 
-        Duration timeSinceStart = Duration.between(taskStartDateTime, currentDateTime);
+        Duration timeSinceStart = Duration.between(timeFrame.startDateTime(), currentDateTime);
 
         return timeSinceStart.toMinutes() % reminderInterval.toMinutes() == 0;
     }

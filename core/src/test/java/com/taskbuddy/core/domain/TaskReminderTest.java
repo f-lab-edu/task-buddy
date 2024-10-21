@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ReminderSettingsTest {
+class TaskReminderTest {
 
     @Test
-    void task와_reminderInterval로_ReminderSettings_객체를_생성할_수_있다() {
+    void task와_reminderInterval로_TaskReminder_객체를_생성할_수_있다() {
         //given
         Task mockTask = Mockito.mock(Task.class);
         Mockito.when(mockTask.getId()).thenReturn(1L);
@@ -25,16 +25,16 @@ class ReminderSettingsTest {
         TestClockHolder testClockHolder = new TestClockHolder(createdDateTime);
 
         //when
-        ReminderSettings reminderSettings = ReminderSettings.from(mockTask, givenReminderInterval, testClockHolder);
+        TaskReminder taskReminder = TaskReminder.from(mockTask, givenReminderInterval, testClockHolder);
 
         //then
-        assertThat(reminderSettings).isNotNull();
-        assertThat(reminderSettings.getId()).isNull();
-        assertThat(reminderSettings.getTaskId()).isEqualTo(1L);
-        assertThat(reminderSettings.getReminderInterval()).isEqualTo(givenReminderInterval);
-        assertThat(reminderSettings.getLastReminderSentTime()).isNull();;
-        assertThat(reminderSettings.getCreatedAt()).isEqualTo(createdDateTime);
-        assertThat(reminderSettings.getUpdatedAt()).isEqualTo(createdDateTime);
+        assertThat(taskReminder).isNotNull();
+        assertThat(taskReminder.getId()).isNull();
+        assertThat(taskReminder.getTaskId()).isEqualTo(1L);
+        assertThat(taskReminder.getReminderInterval()).isEqualTo(givenReminderInterval);
+        assertThat(taskReminder.getLastReminderSentTime()).isNull();;
+        assertThat(taskReminder.getCreatedAt()).isEqualTo(createdDateTime);
+        assertThat(taskReminder.getUpdatedAt()).isEqualTo(createdDateTime);
     }
 
     @Test
@@ -44,7 +44,7 @@ class ReminderSettingsTest {
         LocalDateTime lastReminderSentTime = LocalDateTime.now().minusMinutes(20);
         Duration reminderInterval = Duration.ofMinutes(20);
 
-        ReminderSettings reminderSettings = ReminderSettings.builder()
+        TaskReminder taskReminder = TaskReminder.builder()
                 .id(1L)
                 .task(Task.builder().id(1L).build())
                 .lastReminderSentTime(lastReminderSentTime)
@@ -57,15 +57,15 @@ class ReminderSettingsTest {
         LocalDateTime updatedDateTime = LocalDateTime.now();
 
         //when
-        reminderSettings.updateLastReminderSentTime(updatedLastSentTime, new TestClockHolder(updatedDateTime));
+        taskReminder.updateLastReminderSentTime(updatedLastSentTime, new TestClockHolder(updatedDateTime));
 
         //then
-        assertThat(reminderSettings.getId()).isEqualTo(1L);
-        assertThat(reminderSettings.getTaskId()).isEqualTo(1L);
-        assertThat(reminderSettings.getReminderInterval()).isEqualTo(reminderInterval);
-        assertThat(reminderSettings.getLastReminderSentTime()).isEqualTo(updatedLastSentTime);
-        assertThat(reminderSettings.getCreatedAt()).isEqualTo(createdDateTime);
-        assertThat(reminderSettings.getUpdatedAt()).isEqualTo(updatedDateTime);
+        assertThat(taskReminder.getId()).isEqualTo(1L);
+        assertThat(taskReminder.getTaskId()).isEqualTo(1L);
+        assertThat(taskReminder.getReminderInterval()).isEqualTo(reminderInterval);
+        assertThat(taskReminder.getLastReminderSentTime()).isEqualTo(updatedLastSentTime);
+        assertThat(taskReminder.getCreatedAt()).isEqualTo(createdDateTime);
+        assertThat(taskReminder.getUpdatedAt()).isEqualTo(updatedDateTime);
     }
 
     @Test
@@ -83,7 +83,7 @@ class ReminderSettingsTest {
 
         LocalDateTime lastReminderSentTime = LocalDateTime.now().minusMinutes(20);
         Duration reminderInterval = Duration.ofMinutes(10);
-        ReminderSettings reminderSettings = ReminderSettings.builder()
+        TaskReminder taskReminder = TaskReminder.builder()
                 .id(1L)
                 .task(task)
                 .lastReminderSentTime(lastReminderSentTime)
@@ -96,27 +96,27 @@ class ReminderSettingsTest {
         Assertions.assertAll(
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime;
-                    Assertions.assertTrue(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertTrue(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 },
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime.plusMinutes(10);
-                    Assertions.assertTrue(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertTrue(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 },
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime.plusMinutes(20);
-                    Assertions.assertTrue(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertTrue(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 },
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime.plusMinutes(30);
-                    Assertions.assertTrue(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertTrue(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 },
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime.plusMinutes(3);
-                    Assertions.assertFalse(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertFalse(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 },
                 () -> {
                     LocalDateTime currentDateTime = taskStartDateTime.plusMinutes(22);
-                    Assertions.assertFalse(reminderSettings.isReminderDue(new TestClockHolder(currentDateTime)));
+                    Assertions.assertFalse(taskReminder.isReminderDue(new TestClockHolder(currentDateTime)));
                 }
         );
     }
@@ -128,7 +128,7 @@ class ReminderSettingsTest {
         LocalDateTime lastReminderSentTime = LocalDateTime.now().minusMinutes(20);
         Duration reminderInterval = Duration.ofMinutes(20);
 
-        ReminderSettings reminderSettings = ReminderSettings.builder()
+        TaskReminder taskReminder = TaskReminder.builder()
                 .id(1L)
                 .task(Task.builder().id(1L).build())
                 .lastReminderSentTime(lastReminderSentTime)
@@ -141,14 +141,14 @@ class ReminderSettingsTest {
         LocalDateTime updatedDateTime = LocalDateTime.now();
 
         //when
-        reminderSettings.updateReminderInterval(updatedReminderInterval, new TestClockHolder(updatedDateTime));
+        taskReminder.updateReminderInterval(updatedReminderInterval, new TestClockHolder(updatedDateTime));
 
         //then
-        assertThat(reminderSettings.getId()).isEqualTo(1L);
-        assertThat(reminderSettings.getTaskId()).isEqualTo(1L);
-        assertThat(reminderSettings.getReminderInterval()).isEqualTo(updatedReminderInterval);
-        assertThat(reminderSettings.getLastReminderSentTime()).isEqualTo(lastReminderSentTime);
-        assertThat(reminderSettings.getCreatedAt()).isEqualTo(createdDateTime);
-        assertThat(reminderSettings.getUpdatedAt()).isEqualTo(updatedDateTime);
+        assertThat(taskReminder.getId()).isEqualTo(1L);
+        assertThat(taskReminder.getTaskId()).isEqualTo(1L);
+        assertThat(taskReminder.getReminderInterval()).isEqualTo(updatedReminderInterval);
+        assertThat(taskReminder.getLastReminderSentTime()).isEqualTo(lastReminderSentTime);
+        assertThat(taskReminder.getCreatedAt()).isEqualTo(createdDateTime);
+        assertThat(taskReminder.getUpdatedAt()).isEqualTo(updatedDateTime);
     }
 }
