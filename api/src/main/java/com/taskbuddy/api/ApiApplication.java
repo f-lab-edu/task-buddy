@@ -1,4 +1,4 @@
-package com.taskbuddy;
+package com.taskbuddy.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
