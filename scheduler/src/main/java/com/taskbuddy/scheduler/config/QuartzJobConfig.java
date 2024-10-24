@@ -22,7 +22,7 @@ public class QuartzJobConfig {
                 .forJob(jobDetail)
                 .withIdentity("taskReminderTrigger")
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInSeconds(10)
+                        .withIntervalInMinutes(1)
                         .repeatForever())
                 .build();
     }

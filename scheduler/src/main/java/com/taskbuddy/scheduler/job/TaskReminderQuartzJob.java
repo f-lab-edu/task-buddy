@@ -21,8 +21,6 @@ public class TaskReminderQuartzJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) {
-        log.info("TaskReminderQuartzJob.execute");
-
         List<TaskReminder> taskReminders = taskReminderReadService.getAllToSendReminder();
 
         for (TaskReminder taskReminder : taskReminders) {
@@ -31,7 +29,6 @@ public class TaskReminderQuartzJob implements Job {
                     .title(taskReminder.getTask().getTitle())
                     .build();
 
-            System.out.println("taskReminderMessage.toString() = " + message);
             kafkaTemplate.send("task-reminders", message);
         }
     }
