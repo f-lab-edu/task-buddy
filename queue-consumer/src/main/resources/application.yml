@@ -1,10 +1,8 @@
 spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: reminder-group
-      auto-offset-reset: latest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  profiles:
+    active: local
+    group:
+      local:
+        - queue
 server:
   port: 8082
