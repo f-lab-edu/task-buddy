@@ -7,7 +7,9 @@ import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.response.ResultStatus;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.core.database.repository.TaskReminderRepository;
 import com.taskbuddy.core.domain.Task;
+import com.taskbuddy.core.domain.TaskReminder;
 import com.taskbuddy.core.service.port.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,9 @@ public class TaskControllerTest {
 
     @MockBean
     private TaskRepository taskRepository;
+
+    @MockBean
+    private TaskReminderRepository taskReminderRepository;
 
     @BeforeEach
     void setup(RestDocumentationContextProvider restDocumentation) {
@@ -253,6 +258,7 @@ public class TaskControllerTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
         Mockito.when(taskRepository.findById(givenId)).thenReturn(Optional.of(mockTask));
+        Mockito.doNothing().when(taskReminderRepository).save(Mockito.any(TaskReminder.class));
 
         TaskContentUpdateRequest request = new TaskContentUpdateRequest(
                 "update title",

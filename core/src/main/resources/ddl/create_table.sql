@@ -10,3 +10,12 @@ create table tasks (
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
 );
+
+create table task_reminders (
+    id bigint not null auto_increment primary key,
+    task_id bigint not null,
+    last_reminder_sent_time timestamp,
+    reminder_interval varchar(100) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp
+);
