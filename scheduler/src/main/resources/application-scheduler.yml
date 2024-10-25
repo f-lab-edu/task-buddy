@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: scheduler
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org:
+        quartz:
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            useProperties: false
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 20000
+          scheduler:
+            instanceId: AUTO
+            instanceName: TaskClusteredScheduler

@@ -43,7 +43,7 @@ class TaskServiceTest {
         taskService.findCurrentTasksWithReminderEnabled();
 
         //then
-        Mockito.verify(taskRepository.findAllInTimeFrameAndReminderEnabled(true, currentDateTime), Mockito.times(1));
+        Mockito.verify(taskRepository, Mockito.times(1)).findAllInTimeFrameAndReminderEnabled(true, currentDateTime);
     }
 
     @Test

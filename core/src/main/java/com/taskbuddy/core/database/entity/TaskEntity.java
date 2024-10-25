@@ -28,21 +28,18 @@ public class TaskEntity {
 
     private LocalDateTime endDateTime;
 
-    private Boolean isReminderEnabled;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
     @Builder
-    private TaskEntity(Long id, String title, Boolean isDone, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, Boolean isReminderEnabled, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    private TaskEntity(Long id, String title, Boolean isDone, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.isDone = isDone;
         this.description = description;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.isReminderEnabled = isReminderEnabled;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -55,7 +52,6 @@ public class TaskEntity {
                 .description(task.getDescription())
                 .startDateTime(task.getTimeFrame().startDateTime())
                 .endDateTime(task.getTimeFrame().endDateTime())
-                .isReminderEnabled(task.isReminderEnabled())
                 .createdAt(task.getCreatedAt())
                 .updatedAt(task.getUpdatedAt())
                 .build();
@@ -68,9 +64,12 @@ public class TaskEntity {
                 .isDone(isDone)
                 .description(description)
                 .timeFrame(new TimeFrame(startDateTime, endDateTime))
-                .reminderEnabled(isReminderEnabled)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
+    }
+
+    public Long getId() {
+        return id;
     }
 }

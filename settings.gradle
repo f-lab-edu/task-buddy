@@ -6,3 +6,8 @@ rootProject.name = 'task-buddy'
 
 include ':core'
 include ':api'
+include ':db'
+include ':scheduler'
+include ':queue'
+include ':queue-consumer'
+

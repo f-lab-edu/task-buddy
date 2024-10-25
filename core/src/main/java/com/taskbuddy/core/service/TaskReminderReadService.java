@@ -3,11 +3,14 @@ package com.taskbuddy.core.service;
 import com.taskbuddy.core.database.repository.TaskReminderRepository;
 import com.taskbuddy.core.domain.Task;
 import com.taskbuddy.core.domain.TaskReminder;
+import com.taskbuddy.core.domain.user.User;
+import com.taskbuddy.core.domain.user.UserStatus;
 import com.taskbuddy.core.service.port.ClockHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -22,19 +25,37 @@ public class TaskReminderReadService {
     private final ClockHolder clockHolder;
 
     public List<TaskReminder> getAllToSendReminder() {
-        final List<Task> tasks = taskService.findCurrentTasksWithReminderEnabled();
+        return List.of(TaskReminder.builder()
+                .id(1L)
+                .task(Task.builder()
+                        .id(1L)
+                        .user(User.builder()
+                                .id(1L)
+                                .status(UserStatus.DISCONNECTED)
+                                .build())
+                        .title("Task title")
+                        .build())
+                .reminderInterval(Duration.ofMinutes(10))
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build());
 
-        if (tasks.isEmpty()) {
-            return Collections.emptyList();
-        }
+//        final List<Task> tasks = taskService.findCurrentTasksWithReminderEnabled();
 
-        final Set<Long> userIds = userService.filterUserIdsWithOnTask(mappedTasks(tasks, Task::getUserId));
-        tasks.removeIf(task -> userIds.contains(task.getUserId()));
+//        if (tasks.isEmpty()) {
+//            return Collections.emptyList();
+//        }
 
-        return taskReminderRepository.findAllInTaskIds(mappedTasks(tasks, Task::getId))
-                .stream()
-                .filter(taskReminder -> taskReminder.isReminderDue(clockHolder))
-                .toList();
+//        final Set<Long> userIds = userService.filterUserIdsWithOnTask(mappedTasks(tasks, Task::getUserId));
+//        tasks.removeIf(task -> userIds.contains(task.getUserId()));
+
+//        return taskReminderRepository.findAllInTaskIds(mappedTasks(tasks, Task::getId))
+//                .stream()
+//                .filter(taskReminder -> taskReminder.isReminderDue(clockHolder))
+//                .toList();
+
+
+
     }
 
     private Set<Long> mappedTasks(List<Task> tasks, Function<Task, Long> mapper) {

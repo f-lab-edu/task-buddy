@@ -3,4 +3,6 @@ spring:
     active: local
     group:
       local:
-        - db
+        - queue
+server:
+  port: 8082

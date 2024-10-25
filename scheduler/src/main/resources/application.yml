@@ -3,4 +3,8 @@ spring:
     active: local
     group:
       local:
+        - scheduler
+        - queue
         - db
+server:
+  port: 8081
