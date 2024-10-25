@@ -3,6 +3,7 @@ package com.taskbuddy.scheduler.job;
 import com.taskbuddy.core.domain.TaskReminder;
 import com.taskbuddy.core.service.TaskReminderReadService;
 import com.taskbuddy.queue.message.TaskReminderMessage;
+import com.taskbuddy.queue.topic.Topics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
@@ -29,7 +30,7 @@ public class TaskReminderQuartzJob implements Job {
                     .title(taskReminder.getTask().getTitle())
                     .build();
 
-            kafkaTemplate.send("task-reminders", message);
+            kafkaTemplate.send(Topics.TaskReminder.PUSH, message);
         }
     }
 }
