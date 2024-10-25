@@ -30,7 +30,7 @@ public class NotificationReminderListener {
     @KafkaListener(topics = Topics.TaskReminder.DB_UPDATE, groupId = GroupIds.TASK_REMINDER)
     public void listenForDbUpdate(PushSendResponse message) {
         if (message.isSentSuccessfully()) {
-            taskReminderService.updateLastSentTime(message.getSentDateTime());
+            taskReminderService.updateLastSentTime(message.getId(), message.getSentDateTime());
         }
     }
 }

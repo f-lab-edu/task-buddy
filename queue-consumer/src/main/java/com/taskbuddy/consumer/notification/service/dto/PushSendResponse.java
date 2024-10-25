@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 
 @Getter
 public class PushSendResponse {
-    public boolean sentSuccessfully;
-    public LocalDateTime sentDateTime;
+    private Long id;
+    private boolean sentSuccessfully;
+    private LocalDateTime sentDateTime;
 
-    public PushSendResponse(boolean sentSuccessfully, LocalDateTime sentDateTime) {
+    public PushSendResponse(Long id, boolean sentSuccessfully, LocalDateTime sentDateTime) {
+        this.id = id;
         this.sentSuccessfully = sentSuccessfully;
         this.sentDateTime = sentDateTime;
     }

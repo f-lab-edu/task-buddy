@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Service
 public class TaskReminderService {
 
-    public void updateLastSentTime(LocalDateTime sentDateTime) {
+    public void updateLastSentTime(Long id, LocalDateTime sentDateTime) {
         // TODO core에서 업데이트로직 옮겨오기
     }
 }

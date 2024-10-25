@@ -15,6 +15,6 @@ public class NotificationService {
         // Push Interface
 
         // FIXME 임시 데이터 반환 및 푸시 발송 구현하기
-        return new PushSendResponse(true, LocalDateTime.now());
+        return new PushSendResponse(message.getId(), true, LocalDateTime.now());
     }
 }
