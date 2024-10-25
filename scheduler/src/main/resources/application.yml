@@ -5,5 +5,6 @@ spring:
       local:
         - scheduler
         - queue
+        - db
 server:
   port: 8081

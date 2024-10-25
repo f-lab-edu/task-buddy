@@ -19,8 +19,3 @@ spring:
           scheduler:
             instanceId: AUTO
             instanceName: TaskClusteredScheduler
-  datasource:
-    url: jdbc:mysql://localhost:3306/taskbuddy
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
