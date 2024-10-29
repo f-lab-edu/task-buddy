@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.api.error.code.ErrorCodes;
 import com.taskbuddy.core.database.repository.TaskReminderRepository;
 import com.taskbuddy.core.domain.Task;
 import com.taskbuddy.core.domain.TaskReminder;
@@ -97,11 +98,10 @@ public class TaskControllerTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.SUCCESS.name())
-                .jsonPath("$.data.id").value(allOf(notNullValue(), greaterThan(0)))
-                .jsonPath("$.data.title").exists()
-                .jsonPath("$.data.isDone").exists()
-                .jsonPath("$.data.timeFrame").exists()
+                .jsonPath("$.id").value(allOf(notNullValue(), greaterThan(0)))
+                .jsonPath("$.title").exists()
+                .jsonPath("$.isDone").exists()
+                .jsonPath("$.timeFrame").exists()
                 .consumeWith(document("v1/tasks/get-a-task-with-id/success",
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("accept header")
@@ -113,15 +113,13 @@ public class TaskControllerTest {
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("응답 헤더")
                         ),
                         responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("The status of teh response, e.g."))
-                                .andWithPrefix("data.",
-                                        fieldWithPath("id").type(JsonFieldType.NUMBER).description("task id"),
-                                        fieldWithPath("title").type(JsonFieldType.STRING).description("이름"),
-                                        fieldWithPath("description").type(JsonFieldType.STRING).description("추가 설명"),
-                                        fieldWithPath("isDone").type(JsonFieldType.BOOLEAN).description("완료 여부"),
-                                        fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
-                                        fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
-                                        fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)"))));
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("task id"),
+                                fieldWithPath("title").type(JsonFieldType.STRING).description("이름"),
+                                fieldWithPath("description").type(JsonFieldType.STRING).description("추가 설명"),
+                                fieldWithPath("isDone").type(JsonFieldType.BOOLEAN).description("완료 여부"),
+                                fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
+                                fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
+                                fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)"))));
     }
 
     @Test
@@ -133,11 +131,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The given task with id does not exist.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/get-a-task-with-id/fail/does-not-exist"));
     }
 
@@ -150,11 +144,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The id value must be positive.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/get-a-task-with-id/fail/negative-id-value"));
     }
 
@@ -184,16 +174,12 @@ public class TaskControllerTest {
         webTestClient.post()
                 .uri("/v1/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(request))
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.SUCCESS.name())
-                .jsonPath("$.data").doesNotExist()
                 .consumeWith(document("v1/tasks/create-a-task/success",
                         requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
                         requestFields(
@@ -204,11 +190,8 @@ public class TaskControllerTest {
                                 fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)")
                         ),
                         responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type"),
                                 headerWithName(HttpHeaders.LOCATION).description("생성된 Task 조회 URL")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+                        )));
     }
 
     @Test
@@ -231,11 +214,7 @@ public class TaskControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The title of task must not be blank.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/create-a-task/fail/invalid-request-data"));
     }
 
@@ -267,19 +246,15 @@ public class TaskControllerTest {
         webTestClient.patch()
                 .uri("/v1/tasks/{id}/content", givenId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(request))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNoContent()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.SUCCESS.name())
-                .jsonPath("$.data").doesNotExist()
                 .consumeWith(document("v1/tasks/update-a-task-content/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
                         requestFields(
@@ -288,12 +263,7 @@ public class TaskControllerTest {
                                 fieldWithPath("timeFrame").type(JsonFieldType.OBJECT).description("수행기간"),
                                 fieldWithPath("timeFrame.startDateTime").type(JsonFieldType.STRING).description("시작일시 (yyyy-MM-dd)"),
                                 fieldWithPath("timeFrame.endDateTime").type(JsonFieldType.STRING).description("종료일시 (yyyy-MM-dd)")
-                        ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+                        )));
     }
 
     @Test
@@ -314,11 +284,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The id value must be positive.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/negative-id-value"));
     }
 
@@ -343,11 +309,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The title of task must not be blank.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/invalid-request-data"));
     }
 
@@ -369,11 +331,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The given task with id does not exist.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/does-not-exist"));
     }
 
@@ -391,11 +349,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The given task with id does not exist.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/update-a-task-done/fail/does-not-exist"));
     }
 
@@ -422,28 +376,20 @@ public class TaskControllerTest {
         webTestClient.patch()
                 .uri("/v1/tasks/{id}/is-done", givenTaskId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(body))
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isNoContent()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.SUCCESS.name())
-                .jsonPath("$.data").doesNotExist()
                 .consumeWith(document("v1/tasks/update-a-task-done/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
                         requestFields(
                                 fieldWithPath("isDone").type(JsonFieldType.BOOLEAN).description("완료 여부")
-                        ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+                        )));
     }
 
     @Test
@@ -453,25 +399,13 @@ public class TaskControllerTest {
 
         webTestClient.delete()
                 .uri("/v1/tasks/{id}", givenTaskId)
-                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .expectStatus().isNoContent()
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.SUCCESS.name())
-                .jsonPath("$.data").doesNotExist()
                 .consumeWith(document("v1/tasks/remove-a-task/success",
                         pathParameters(
                                 parameterWithName("id").description("task id")
-                        ),
-                        requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description("accept header")
-                        ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("response body content type")
-                        ),
-                        responseFields(
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("성공 여부"))));
+                        )));
     }
 
     @Test
@@ -486,11 +420,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The given task with id does not exist.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/remove-a-task/fail/does-not-exist"));
     }
 
@@ -503,11 +433,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.status").isEqualTo(ResultStatus.FAIL.name())
-                .jsonPath("$.data").doesNotExist()
-                .jsonPath("$.error").exists()
-                .jsonPath("$.error.code").isEqualTo("INVALID_PARAMETER_STATE")
-                .jsonPath("$.error.message").isEqualTo("The id value must be positive.")
+                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
                 .consumeWith(document("v1/tasks/remove-a-task/fail/negative-id-value"));
     }
 }

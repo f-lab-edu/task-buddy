@@ -1,7 +1,7 @@
 package com.taskbuddy.api.controller;
 
-import com.taskbuddy.api.error.ErrorCodes;
 import com.taskbuddy.api.error.ErrorResponse;
+import com.taskbuddy.api.error.code.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
