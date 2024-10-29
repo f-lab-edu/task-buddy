@@ -3,7 +3,6 @@ package com.taskbuddy.api.controller;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskDoneUpdateRequest;
-import com.taskbuddy.api.controller.response.ApiResponse;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
 import com.taskbuddy.core.domain.Task;
 import com.taskbuddy.core.domain.TaskContentUpdate;
@@ -25,18 +24,18 @@ public class TaskController {
     private final TaskService taskService;
 
     @GetMapping("/{id}")
-    ResponseEntity<ApiResponse<TaskResponse>> getTask(@PathVariable("id") Long id) {
+    ResponseEntity<TaskResponse> getTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         final Task task = taskService.getTask(id);
         final TaskResponse response = TaskResponse.from(task);
 
         return ResponseEntity
-                .ok(ApiResponse.success(response));
+                .ok(response);
     }
 
     @PostMapping
-    ResponseEntity<ApiResponse<?>> createTask(@RequestBody TaskCreateRequest request) {
+    ResponseEntity<Void> createTask(@RequestBody TaskCreateRequest request) {
         //FIXME (#15) 인증 넣으면 제거하기
         final Long dummyUserId = 1L;
 
@@ -54,11 +53,11 @@ public class TaskController {
 
         return ResponseEntity
                 .created(URI.create("localhost:8080/v1/tasks/" + createdTaskId))
-                .body(ApiResponse.success());
+                .build();
     }
 
     @PatchMapping("/{id}/content")
-    ResponseEntity<ApiResponse<?>> updateTaskContent(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
+    ResponseEntity<Void> updateTaskContent(@PathVariable("id") Long id, @RequestBody TaskContentUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         //FIXME (#15) 인증 넣으면 제거하기
@@ -76,11 +75,12 @@ public class TaskController {
         taskService.updateContent(taskContentUpdate);
 
         return ResponseEntity
-                .ok(ApiResponse.success());
+                .noContent()
+                .build();
     }
 
     @PatchMapping("/{id}/is-done")
-    ResponseEntity<ApiResponse<?>> updateTaskDone(@PathVariable("id") Long id, @RequestBody TaskDoneUpdateRequest request) {
+    ResponseEntity<Void> updateTaskDone(@PathVariable("id") Long id, @RequestBody TaskDoneUpdateRequest request) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         //FIXME (#15) 인증 넣으면 제거하기
@@ -90,17 +90,19 @@ public class TaskController {
         taskService.updateDone(taskDoneUpdate);
 
         return ResponseEntity
-                .ok(ApiResponse.success());
+                .noContent()
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<ApiResponse<?>> deleteTask(@PathVariable("id") Long id) {
+    ResponseEntity<Void> deleteTask(@PathVariable("id") Long id) {
         Assert.state(id >= 0, "The id value must be positive.");
 
         taskService.deleteTask(id);
 
         return ResponseEntity
-                .ok(ApiResponse.success());
+                .noContent()
+                .build();
     }
 
 }

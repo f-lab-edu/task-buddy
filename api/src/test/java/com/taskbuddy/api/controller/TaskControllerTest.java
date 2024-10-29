@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
-import com.taskbuddy.api.controller.response.ResultStatus;
 import com.taskbuddy.api.controller.response.task.TimeFrame;
 import com.taskbuddy.core.database.repository.TaskReminderRepository;
 import com.taskbuddy.core.domain.Task;
