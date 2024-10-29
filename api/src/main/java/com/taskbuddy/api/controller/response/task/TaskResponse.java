@@ -1,6 +1,7 @@
 package com.taskbuddy.api.controller.response.task;
 
-import com.taskbuddy.core.domain.Task;
+import com.taskbuddy.api.domain.Task;
+import com.taskbuddy.api.domain.TimeFrame;
 
 public record TaskResponse (
         Long id,

@@ -1,4 +1,4 @@
-package com.taskbuddy.api.controller.response.task;
+package com.taskbuddy.api.domain;
 
 import org.springframework.util.Assert;
 

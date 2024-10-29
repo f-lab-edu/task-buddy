@@ -1,6 +1,6 @@
 package com.taskbuddy.api.controller.request;
 
-import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.api.domain.TimeFrame;
 import org.springframework.util.Assert;
 
 public record TaskCreateRequest(

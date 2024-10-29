@@ -1,4 +1,4 @@
-package com.taskbuddy.core.database.repository;
+package com.taskbuddy.api.persistence.repository;
 
 import com.taskbuddy.persistence.entity.TaskReminderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

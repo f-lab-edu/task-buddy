@@ -3,14 +3,14 @@ package com.taskbuddy.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.taskbuddy.api.business.port.TaskRepository;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
-import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.api.domain.Task;
+import com.taskbuddy.api.domain.TaskReminder;
+import com.taskbuddy.api.domain.TimeFrame;
 import com.taskbuddy.api.error.code.ErrorCodes;
-import com.taskbuddy.core.database.repository.TaskReminderRepository;
-import com.taskbuddy.core.domain.Task;
-import com.taskbuddy.core.domain.TaskReminder;
-import com.taskbuddy.core.service.port.TaskRepository;
+import com.taskbuddy.api.persistence.repository.TaskReminderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +83,7 @@ public class TaskControllerTest {
                 .title("알고리즘 풀기")
                 .isDone(false)
                 .description("백준1902")
-                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(
+                .timeFrame(new TimeFrame(
                         LocalDateTime.of(2024, 8, 1, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)
                 ))
@@ -160,7 +160,7 @@ public class TaskControllerTest {
                 .title(givenTitle)
                 .isDone(false)
                 .description(givenDescription)
-                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(givenStartDateTime, givenEndDateTime))
+                .timeFrame(new TimeFrame(givenStartDateTime, givenEndDateTime))
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -231,7 +231,7 @@ public class TaskControllerTest {
                 .title(givenTitle)
                 .isDone(false)
                 .description(givenDescription)
-                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(givenStartDateTime, givenEndDateTime))
+                .timeFrame(new TimeFrame(givenStartDateTime, givenEndDateTime))
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -361,7 +361,7 @@ public class TaskControllerTest {
                 .title("알고리즘 풀기")
                 .isDone(false)
                 .description("백준1902")
-                .timeFrame(new com.taskbuddy.core.domain.TimeFrame(
+                .timeFrame(new TimeFrame(
                         LocalDateTime.of(2024, 8, 1, 0, 0, 0),
                         LocalDateTime.of(2024, 8, 31, 23, 59, 59)
                 ))

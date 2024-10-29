@@ -1,6 +1,6 @@
 package com.taskbuddy.api.controller.request;
 
-import com.taskbuddy.api.controller.response.task.TimeFrame;
+import com.taskbuddy.api.domain.TimeFrame;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class TaskContentUpdateRequestTest {
     @ParameterizedTest

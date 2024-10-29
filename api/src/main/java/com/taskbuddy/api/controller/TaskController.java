@@ -1,14 +1,14 @@
 package com.taskbuddy.api.controller;
 
+import com.taskbuddy.api.business.TaskService;
 import com.taskbuddy.api.controller.request.TaskContentUpdateRequest;
 import com.taskbuddy.api.controller.request.TaskCreateRequest;
 import com.taskbuddy.api.controller.request.TaskDoneUpdateRequest;
 import com.taskbuddy.api.controller.response.task.TaskResponse;
-import com.taskbuddy.core.domain.Task;
-import com.taskbuddy.core.domain.TaskContentUpdate;
-import com.taskbuddy.core.domain.TaskCreate;
-import com.taskbuddy.core.domain.TaskDoneUpdate;
-import com.taskbuddy.core.service.TaskService;
+import com.taskbuddy.api.domain.Task;
+import com.taskbuddy.api.domain.TaskContentUpdate;
+import com.taskbuddy.api.domain.TaskCreate;
+import com.taskbuddy.api.domain.TaskDoneUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;

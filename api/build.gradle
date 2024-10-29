@@ -22,11 +22,11 @@ configurations {
 }
 
 dependencies {
-    implementation project(':core')
     implementation project(':db')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
     testRuntimeOnly 'com.h2database:h2'
