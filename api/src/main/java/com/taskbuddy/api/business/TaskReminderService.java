@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class TaskReminderWriteService {
+public class TaskReminderService {
     private final TaskReminderRepository taskReminderRepository;
     private final ClockHolder clockHolder;
 

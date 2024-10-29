@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskReminderWriteService taskReminderWriteService;
+    private final TaskReminderService taskReminderService;
     private final ClockHolder clockHolder;
 
     public Task getTask(Long id) {
@@ -27,7 +27,7 @@ public class TaskService {
         Task task = Task.from(taskCreate, clockHolder);
         task = taskRepository.save(task);
 
-        taskReminderWriteService.initialize(task, taskCreate.reminderInterval());
+        taskReminderService.initialize(task, taskCreate.reminderInterval());
 
         return task.getId();
     }
@@ -40,7 +40,7 @@ public class TaskService {
         task.update(taskContentUpdate, clockHolder);
         taskRepository.save(task);
 
-        taskReminderWriteService.update(task, taskContentUpdate.reminderInterval());
+        taskReminderService.update(task, taskContentUpdate.reminderInterval());
     }
 
 
@@ -61,6 +61,6 @@ public class TaskService {
         }
 
         taskRepository.deleteById(id);
-        taskReminderWriteService.deleteByTaskId(id);
+        taskReminderService.deleteByTaskId(id);
     }
 }
