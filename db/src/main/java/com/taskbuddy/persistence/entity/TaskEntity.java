@@ -43,4 +43,16 @@ public class TaskEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public TaskEntityBuilder builderOfCopy() {
+        return TaskEntity.builder()
+                .id(id)
+                .title(title)
+                .isDone(isDone)
+                .description(description)
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt);
+    }
 }

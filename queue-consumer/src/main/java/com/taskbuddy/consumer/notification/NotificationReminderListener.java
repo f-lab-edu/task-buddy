@@ -12,6 +12,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -29,8 +31,10 @@ public class NotificationReminderListener {
 
     @KafkaListener(topics = Topics.TaskReminder.DB_UPDATE, groupId = GroupIds.TASK_REMINDER)
     public void listenForDbUpdate(PushSendResponse message) {
+        final LocalDateTime requestDateTime = LocalDateTime.now();
+
         if (message.isSentSuccessfully()) {
-            taskReminderService.updateLastSentTime(message.getId(), message.getSentDateTime());
+            taskReminderService.updateLastSentTime(message.getId(), message.getSentDateTime(), requestDateTime);
         }
     }
 }

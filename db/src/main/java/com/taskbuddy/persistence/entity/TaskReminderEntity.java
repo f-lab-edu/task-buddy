@@ -41,6 +41,16 @@ public class TaskReminderEntity {
         this.updatedAt = updatedAt;
     }
 
+    public TaskReminderEntity.TaskReminderEntityBuilder builderOfCopy() {
+        return TaskReminderEntity.builder()
+                .id(id)
+                .task(task)
+                .lastReminderSentTime(lastReminderSentTime)
+                .reminderInterval(reminderInterval)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt);
+    }
+
     public Long getTaskId() {
         return task.getId();
     }
