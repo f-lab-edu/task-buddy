@@ -1,4 +1,4 @@
-package com.taskbuddy.api.business.dto;
+package com.taskbuddy.api.business.task.dto;
 
 import com.taskbuddy.api.business.task.dto.TimeFrame;
 import org.junit.jupiter.api.Test;

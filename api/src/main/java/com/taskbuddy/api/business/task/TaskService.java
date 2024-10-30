@@ -1,7 +1,6 @@
 package com.taskbuddy.api.business.task;
 
 import com.taskbuddy.api.business.taskreminder.TaskReminderService;
-import com.taskbuddy.api.business.dto.*;
 import com.taskbuddy.api.business.task.dto.TaskContentUpdate;
 import com.taskbuddy.api.business.task.dto.TaskCreate;
 import com.taskbuddy.api.business.task.dto.TaskDoneUpdate;
@@ -11,12 +10,14 @@ import com.taskbuddy.api.business.taskreminder.dto.TaskReminderUpdate;
 import com.taskbuddy.api.persistence.repository.TaskJpaRepository;
 import com.taskbuddy.api.presentation.task.response.TaskResponse;
 import com.taskbuddy.persistence.entity.TaskEntity;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Builder
 @RequiredArgsConstructor
 @Service
 public class TaskService {
@@ -26,7 +27,6 @@ public class TaskService {
     public TaskResponse getTaskResponse(Long id) {
         final TaskEntity task = taskJpaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
-
 
         return new TaskResponse(
                 task.getId(),
@@ -39,26 +39,13 @@ public class TaskService {
 
     @Transactional
     public Long createTask(TaskCreate taskCreate, LocalDateTime requestDateTime) {
-        final TaskEntity savedTask = taskJpaRepository.save(createEntity(taskCreate, requestDateTime));
+        TaskEntity entity = taskCreate.createEntity(requestDateTime);
+        final TaskEntity savedEntity = taskJpaRepository.save(entity);
 
-        TaskReminderInitialize taskReminderInitialize = new TaskReminderInitialize(savedTask.getId(), taskCreate.reminderInterval());
+        TaskReminderInitialize taskReminderInitialize = new TaskReminderInitialize(savedEntity.getId(), taskCreate.reminderInterval());
         taskReminderService.initialize(taskReminderInitialize, requestDateTime);
 
-        return savedTask.getId();
-    }
-
-    private TaskEntity createEntity(TaskCreate taskCreate, LocalDateTime requestDateTime) {
-        final boolean isDoneDefaultValue = false;
-
-        return TaskEntity.builder()
-                .title(taskCreate.title())
-                .isDone(isDoneDefaultValue)
-                .description(taskCreate.description())
-                .startDateTime(taskCreate.startDateTime())
-                .endDateTime(taskCreate.endDateTime())
-                .createdAt(requestDateTime)
-                .updatedAt(requestDateTime)
-                .build();
+        return savedEntity.getId();
     }
 
     @Transactional
@@ -66,20 +53,11 @@ public class TaskService {
         TaskEntity findEntity = taskJpaRepository.findById(taskContentUpdate.id())
                 .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
 
-        TaskEntity updatedEntity = updateContent(findEntity, taskContentUpdate, requestDateTime);
+        TaskEntity updatedEntity = taskContentUpdate.updatedEntity(findEntity, requestDateTime);
         taskJpaRepository.save(updatedEntity);
 
-        taskReminderService.update(new TaskReminderUpdate(taskContentUpdate.id(), taskContentUpdate.reminderInterval()), requestDateTime);
-    }
-
-    private TaskEntity updateContent(TaskEntity task, TaskContentUpdate taskContentUpdate, LocalDateTime requestDateTime) {
-        return task.builderOfCopy()
-                .title(taskContentUpdate.title())
-                .description(taskContentUpdate.description())
-                .startDateTime(taskContentUpdate.startDateTime())
-                .endDateTime(taskContentUpdate.endDateTime())
-                .updatedAt(requestDateTime)
-                .build();
+        TaskReminderUpdate taskReminderUpdate = new TaskReminderUpdate(taskContentUpdate.id(), taskContentUpdate.reminderInterval());
+        taskReminderService.update(taskReminderUpdate, requestDateTime);
     }
 
     public void updateDone(TaskDoneUpdate taskDoneUpdate, LocalDateTime requestDateTime) {
@@ -90,14 +68,8 @@ public class TaskService {
             return;
         }
 
-        taskJpaRepository.save(updateDone(task, taskDoneUpdate, requestDateTime));
-    }
-
-    private TaskEntity updateDone(TaskEntity task, TaskDoneUpdate taskDoneUpdate, LocalDateTime requestDateTime) {
-        return task.builderOfCopy()
-                .isDone(taskDoneUpdate.isDone())
-                .updatedAt(requestDateTime)
-                .build();
+        TaskEntity updatedEntity = taskDoneUpdate.updatedEntity(task, requestDateTime);
+        taskJpaRepository.save(updatedEntity);
     }
 
     @Transactional
