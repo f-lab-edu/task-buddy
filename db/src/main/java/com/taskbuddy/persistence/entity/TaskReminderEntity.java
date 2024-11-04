@@ -50,8 +50,4 @@ public class TaskReminderEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt);
     }
-
-    public Long getTaskId() {
-        return task.getId();
-    }
 }
