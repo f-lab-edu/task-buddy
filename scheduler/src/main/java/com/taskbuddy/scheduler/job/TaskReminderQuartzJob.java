@@ -1,9 +1,9 @@
 package com.taskbuddy.scheduler.job;
 
-import com.taskbuddy.core.domain.TaskReminder;
-import com.taskbuddy.core.service.TaskReminderReadService;
 import com.taskbuddy.queue.message.TaskReminderMessage;
 import com.taskbuddy.queue.topic.Topics;
+import com.taskbuddy.scheduler.business.TaskReminderService;
+import com.taskbuddy.scheduler.domain.TaskReminder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
@@ -18,11 +18,11 @@ import java.util.List;
 @Component
 public class TaskReminderQuartzJob implements Job {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final TaskReminderReadService taskReminderReadService;
+    private final TaskReminderService TaskReminderService;
 
     @Override
     public void execute(JobExecutionContext context) {
-        List<TaskReminder> taskReminders = taskReminderReadService.getAllToSendReminder();
+        List<TaskReminder> taskReminders = TaskReminderService.getAllToSendReminder();
 
         for (TaskReminder taskReminder : taskReminders) {
             TaskReminderMessage message = TaskReminderMessage.builder()

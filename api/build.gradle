@@ -22,7 +22,6 @@ configurations {
 }
 
 dependencies {
-    implementation project(':core')
     implementation project(':db')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'

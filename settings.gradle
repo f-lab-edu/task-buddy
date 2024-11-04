@@ -4,7 +4,6 @@ plugins {
 
 rootProject.name = 'task-buddy'
 
-include ':core'
 include ':api'
 include ':db'
 include ':scheduler'

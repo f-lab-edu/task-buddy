@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    implementation project(':core')
     implementation project(':queue')
     implementation project(':db')
     implementation 'org.springframework.boot:spring-boot-starter-web'
