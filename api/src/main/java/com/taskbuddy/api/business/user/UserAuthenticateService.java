@@ -12,8 +12,10 @@ public class UserAuthenticateService {
     private final UserJpaRepository userJpaRepository;
 
     public UserSignupResponse signup(UserSignupRequest request) {
-        boolean exists = userJpaRepository.existsByEmail(request.email());
-        if (exists) {
-        }
+//        boolean exists = userJpaRepository.existsByEmail(request.email());
+//        if (exists) {
+//        }
+
+        return null;
     }
 }

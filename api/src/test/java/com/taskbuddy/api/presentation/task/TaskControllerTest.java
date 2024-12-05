@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.business.task.dto.TimeFrame;
-import com.taskbuddy.api.error.code.ErrorCodes;
+import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.persistence.repository.TaskJpaRepository;
 import com.taskbuddy.api.persistence.repository.TaskReminderJpaRepository;
 import com.taskbuddy.api.presentation.task.request.TaskContentUpdateRequest;
@@ -125,10 +125,10 @@ public class TaskControllerTest {
                 .uri("/v1/tasks/{id}", 0)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.T1001.name())
                 .consumeWith(document("v1/tasks/get-a-task-with-id/fail/does-not-exist"));
     }
 
@@ -141,7 +141,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.C1001.name())
                 .consumeWith(document("v1/tasks/get-a-task-with-id/fail/negative-id-value"));
     }
 
@@ -212,7 +212,7 @@ public class TaskControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.C1001.name())
                 .consumeWith(document("v1/tasks/create-a-task/fail/invalid-request-data"));
     }
 
@@ -283,7 +283,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.C1001.name())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/negative-id-value"));
     }
 
@@ -308,7 +308,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.C1001.name())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/invalid-request-data"));
     }
 
@@ -327,10 +327,10 @@ public class TaskControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(request))
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.T1001.name())
                 .consumeWith(document("v1/tasks/update-a-task-content/fail/does-not-exist"));
     }
 
@@ -345,10 +345,10 @@ public class TaskControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(body))
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.T1001.name())
                 .consumeWith(document("v1/tasks/update-a-task-done/fail/does-not-exist"));
     }
 
@@ -414,10 +414,10 @@ public class TaskControllerTest {
                 .uri("/v1/tasks/{id}", givenTaskId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.T1001.name())
                 .consumeWith(document("v1/tasks/remove-a-task/fail/does-not-exist"));
     }
 
@@ -430,7 +430,7 @@ public class TaskControllerTest {
                 .expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$.code").isEqualTo(ErrorCodes.INVALID_PARAMETER_STATE.code())
+                .jsonPath("$.code").isEqualTo(ResultCodes.C1001.name())
                 .consumeWith(document("v1/tasks/remove-a-task/fail/negative-id-value"));
     }
 }
