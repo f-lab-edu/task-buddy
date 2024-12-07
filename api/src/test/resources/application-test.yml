@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: db
+      on-profile: test
   datasource:
     url: jdbc:mysql://localhost:3307/taskbuddy_business
     username: ${DB_USERNAME}

@@ -23,6 +23,7 @@ dependencyManagement {
 
 dependencies {
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 }
 

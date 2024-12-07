@@ -1,5 +1,9 @@
 version: '3'
 services:
+  mysql:
+    image: olivejua/taskbuddy-mysql-taskbuddy_business:1.0
+    ports:
+      - "3307:3306"
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:

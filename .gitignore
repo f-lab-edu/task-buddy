@@ -5,3 +5,7 @@ out
 
 ### IntelliJ IDEA ###
 .idea
+
+### secret
+db/docker
+db/src/main/resources/env
