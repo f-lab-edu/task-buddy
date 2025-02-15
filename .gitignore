@@ -5,3 +5,5 @@ out
 
 ### IntelliJ IDEA ###
 .idea
+
+.*.env
