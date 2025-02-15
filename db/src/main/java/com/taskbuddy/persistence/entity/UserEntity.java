@@ -18,6 +18,8 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String email;
+
     private String username;
 
     private String password;
@@ -29,8 +31,9 @@ public class UserEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    private UserEntity(Long id, String username, String password, LocalDateTime passwordUpdatedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    private UserEntity(Long id, String email, String username, String password, LocalDateTime passwordUpdatedAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.email = email;
         this.username = username;
         this.password = password;
         this.passwordUpdatedAt = passwordUpdatedAt;
@@ -41,6 +44,7 @@ public class UserEntity {
     public UserEntityBuilder builderOfCopy() {
         return UserEntity.builder()
                 .id(id)
+                .email(email)
                 .username(username)
                 .password(password)
                 .passwordUpdatedAt(passwordUpdatedAt)
