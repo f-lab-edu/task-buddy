@@ -18,6 +18,10 @@ public class TaskEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
     private String title;
 
     private Boolean isDone;
@@ -33,8 +37,9 @@ public class TaskEntity {
     private LocalDateTime updatedAt;
 
     @Builder
-    private TaskEntity(Long id, String title, Boolean isDone, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    private TaskEntity(Long id, UserEntity user, String title, Boolean isDone, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.user = user;
         this.title = title;
         this.isDone = isDone;
         this.description = description;
@@ -47,6 +52,7 @@ public class TaskEntity {
     public TaskEntityBuilder builderOfCopy() {
         return TaskEntity.builder()
                 .id(id)
+                .user(user)
                 .title(title)
                 .isDone(isDone)
                 .description(description)

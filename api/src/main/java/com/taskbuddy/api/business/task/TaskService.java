@@ -7,7 +7,9 @@ import com.taskbuddy.api.business.task.dto.TaskDoneUpdate;
 import com.taskbuddy.api.business.task.dto.TimeFrame;
 import com.taskbuddy.api.business.taskreminder.dto.TaskReminderInitialize;
 import com.taskbuddy.api.business.taskreminder.dto.TaskReminderUpdate;
+import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.persistence.repository.TaskJpaRepository;
+import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.presentation.task.response.TaskResponse;
 import com.taskbuddy.persistence.entity.TaskEntity;
 import lombok.Builder;
@@ -26,7 +28,7 @@ public class TaskService {
 
     public TaskResponse getTaskResponse(Long id) {
         final TaskEntity task = taskJpaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
+                .orElseThrow(() -> new ApplicationException(ResultCodes.T1001, "The given task with id does not exist."));
 
         return new TaskResponse(
                 task.getId(),
@@ -51,7 +53,7 @@ public class TaskService {
     @Transactional
     public void updateContent(TaskContentUpdate taskContentUpdate, LocalDateTime requestDateTime) {
         TaskEntity findEntity = taskJpaRepository.findById(taskContentUpdate.id())
-                .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
+                .orElseThrow(() -> new ApplicationException(ResultCodes.T1001, "The given task with id does not exist."));
 
         TaskEntity updatedEntity = taskContentUpdate.updatedEntity(findEntity, requestDateTime);
         taskJpaRepository.save(updatedEntity);
@@ -62,7 +64,7 @@ public class TaskService {
 
     public void updateDone(TaskDoneUpdate taskDoneUpdate, LocalDateTime requestDateTime) {
         final TaskEntity task = taskJpaRepository.findById(taskDoneUpdate.id())
-                .orElseThrow(() -> new IllegalArgumentException("The given task with id does not exist."));
+                .orElseThrow(() -> new ApplicationException(ResultCodes.T1001, "The given task with id does not exist."));
 
         if (taskDoneUpdate.isDone() == task.getIsDone()) {
             return;
@@ -77,7 +79,7 @@ public class TaskService {
         final boolean exists = taskJpaRepository.existsById(id);
 
         if (!exists) {
-            throw new IllegalArgumentException("The given task with id does not exist.");
+            throw new ApplicationException(ResultCodes.T1001, "The given task with id does not exist.");
         }
 
         taskJpaRepository.deleteById(id);

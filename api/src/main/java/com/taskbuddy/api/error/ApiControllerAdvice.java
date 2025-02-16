@@ -1,8 +1,7 @@
 package com.taskbuddy.api.error;
 
-import com.taskbuddy.api.error.code.ErrorCodes;
+import com.taskbuddy.api.presentation.ResultCodes;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,19 +12,21 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException exception) {
-        log.info("{} occurred : {}", exception.getClass().getName(), exception.getMessage());
+        log.error("{} occurred : {}", exception.getClass().getName(), exception.getMessage());
+        final ResultCodes resultCode = ResultCodes.C1001;
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorCodes.INVALID_PARAMETER_STATE.toResponse());
+                .status(resultCode.getStatus())
+                .body(resultCode.toResponse());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
-        log.info("{} occurred : {}", exception.getClass().getName(), exception.getMessage());
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException exception) {
+        log.error("{} occurred : {}", exception.getClass().getName(), exception.getMessage());
+        final ResultCodes resultCode = exception.getResultCode();
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorCodes.INVALID_PARAMETER_STATE.toResponse());
+                .status(resultCode.getStatus())
+                .body(resultCode.toResponse());
     }
 }

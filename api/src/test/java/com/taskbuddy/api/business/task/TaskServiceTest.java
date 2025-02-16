@@ -6,6 +6,7 @@ import com.taskbuddy.api.business.task.dto.TaskDoneUpdate;
 import com.taskbuddy.api.business.taskreminder.TaskReminderService;
 import com.taskbuddy.api.business.taskreminder.dto.TaskReminderInitialize;
 import com.taskbuddy.api.business.taskreminder.dto.TaskReminderUpdate;
+import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.persistence.repository.TaskJpaRepository;
 import com.taskbuddy.api.presentation.task.response.TaskResponse;
 import com.taskbuddy.persistence.entity.TaskEntity;
@@ -45,7 +46,7 @@ class TaskServiceTest {
 
         //when & then
         assertThatThrownBy(() -> taskService.getTaskResponse(givenId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ApplicationException.class)
                 .hasMessage("The given task with id does not exist.");
     }
 
@@ -119,7 +120,7 @@ class TaskServiceTest {
 
         //when & then
         assertThatThrownBy(() -> taskService.updateContent(taskContentUpdate, LocalDateTime.now()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ApplicationException.class)
                 .hasMessage("The given task with id does not exist.");
         verify(mockTaskJpaRepository, times(1)).findById(givenTaskId);
         verify(mockTaskJpaRepository, never()).save(any());
@@ -167,7 +168,7 @@ class TaskServiceTest {
 
         //when & then
         assertThatThrownBy(() -> taskService.updateDone(mockTaskDoneUpdate, requestDateTime))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ApplicationException.class)
                 .hasMessage("The given task with id does not exist.");
         verify(mockTaskJpaRepository, times(1)).findById(givenTaskId);
         verify(mockTaskJpaRepository, never()).save(any());
@@ -232,7 +233,7 @@ class TaskServiceTest {
 
         //when & then
         assertThatThrownBy(() -> taskService.deleteTask(givenTaskId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(ApplicationException.class)
                 .hasMessage("The given task with id does not exist.");
 
         verify(mockTaskJpaRepository, times(1)).existsById(givenTaskId);
