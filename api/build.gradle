@@ -24,6 +24,7 @@ configurations {
 dependencies {
     implementation project(':db')
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
