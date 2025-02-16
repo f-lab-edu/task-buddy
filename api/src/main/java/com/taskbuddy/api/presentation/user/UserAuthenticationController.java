@@ -3,6 +3,7 @@ package com.taskbuddy.api.presentation.user;
 import com.taskbuddy.api.business.user.User;
 import com.taskbuddy.api.business.user.UserCreate;
 import com.taskbuddy.api.business.user.UserService;
+import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
@@ -30,6 +31,7 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final PropertiesServer propertiesServer;
     private final ClientSecureDataHandler clientSecureDataHandler;
+    private final UserTokenAuthenticateHandler userTokenAuthenticateHandler;
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody UserSignupRequest request) {
@@ -50,13 +52,6 @@ public class UserAuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<UserSigninResponse> signin(@RequestBody @Valid UserSigninRequest request) {
-        /**
-         * 비밀번호 디코딩
-         *
-         * 엑세스토큰 발급
-         * 리프레시토큰 발급
-         */
-
         final String password = clientSecureDataHandler.decode(request.password());
 
         final Optional<User> optionalUser = userService.findByUsernameAndPassword(request.username(), password);
@@ -65,8 +60,8 @@ public class UserAuthenticationController {
         }
 
         final User user = optionalUser.get();
-        final String refreshToken = refreshTokenIssure.issue(user);
-        final String accessToken = accessTokenIssuer.issue(user);
+        final String refreshToken = userTokenAuthenticateHandler.issueRefreshToken(user);
+        final String accessToken = userTokenAuthenticateHandler.issueAccessToken(user);
 
         // 임시
         LocalDateTime issuedAt = LocalDateTime.now();
