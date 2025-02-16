@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -50,5 +51,14 @@ public class UserService {
 
 //        return userJpaRepository.save(entity);
         return entity;
+    }
+
+    public Optional<User> findByUsernameAndPassword(String username, String password) {
+        /**
+         * username으로 유저를 조회 (존재하지 않으면 실패)
+         * password가 일치하는지 확인 (라이브러리 사용)
+         */
+
+        return Optional.empty();
     }
 }
