@@ -5,5 +5,4 @@ out
 
 ### IntelliJ IDEA ###
 .idea
-
-.*.env
+*.env

@@ -1,3 +1,4 @@
+drop database if exists taskbuddy;
 create database taskbuddy;
 use taskbuddy;
 
