@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 @RestController
 public class UserAuthenticationController {
     private final UserService userService;
@@ -34,8 +34,6 @@ public class UserAuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody UserSignupRequest request) {
-        request.validateIfAllFieldsAreNotEmpty();
-        request.validateIfEmailIsValid();
         final String password = clientSecureDataHandler.decode(request.password());
         request.validateIfPasswordIsValid();
 
