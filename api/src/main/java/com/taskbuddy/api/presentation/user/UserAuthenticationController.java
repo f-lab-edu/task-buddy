@@ -11,13 +11,12 @@ import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import com.taskbuddy.api.presentation.user.response.UserSigninResponse;
 import com.taskbuddy.api.presentation.user.response.UserSignupResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -71,8 +70,15 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<Void> signout() {
+    public ResponseEntity<Void> signout(@RequestHeader(name = HttpHeaders.AUTHORIZATION) @NotBlank String refreshToken) {
+        boolean isValid = userTokenAuthenticateHandler.isValidRefreshToken(refreshToken);
+        if (!isValid) {
+            // 실패
+        }
 
-        return ResponseEntity.ok().build();
+        userTokenAuthenticateHandler.expireAuthentication(refreshToken);
+
+        return ResponseEntity.ok()
+                .build();
     }
 }
