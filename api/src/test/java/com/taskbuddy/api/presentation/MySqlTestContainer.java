@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Sql(scripts = "classpath:schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Testcontainers
-public interface MySqlTestContainers {
+public interface MySqlTestContainer {
 
     @Container
     MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>("mysql:8.0")
