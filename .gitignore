@@ -6,3 +6,4 @@ out
 ### IntelliJ IDEA ###
 .idea
 *.env
+init-users.sql
