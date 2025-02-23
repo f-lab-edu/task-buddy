@@ -9,6 +9,7 @@ import com.taskbuddy.api.business.user.UserCreate;
 import com.taskbuddy.api.business.user.UserService;
 import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
+import com.taskbuddy.api.presentation.MySqlTestContainer;
 import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
 import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
@@ -38,7 +39,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith({RestDocumentationExtension.class})
-public class UserAuthenticationControllerTest {
+public class UserAuthenticationControllerTest implements MySqlTestContainer {
     @Autowired
     private WebTestClient webTestClient;
 

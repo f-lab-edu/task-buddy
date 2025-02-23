@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.business.task.dto.TimeFrame;
+import com.taskbuddy.api.presentation.MySqlTestContainer;
 import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.persistence.repository.TaskJpaRepository;
 import com.taskbuddy.api.persistence.repository.TaskReminderJpaRepository;
@@ -42,7 +43,7 @@ import static org.springframework.restdocs.webtestclient.WebTestClientRestDocume
 //TODO (#12) 태그로 테스트 분리
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith({RestDocumentationExtension.class})
-public class TaskControllerTest {
+public class TaskControllerTest implements MySqlTestContainer {
 
     @Autowired
     private WebTestClient webTestClient;
