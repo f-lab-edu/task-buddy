@@ -10,20 +10,18 @@ import com.taskbuddy.api.business.user.UserService;
 import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.presentation.MySqlTestContainer;
+import com.taskbuddy.api.presentation.SpringTestContainer;
 import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
 import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -37,9 +35,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith({RestDocumentationExtension.class})
-public class UserAuthenticationControllerTest implements MySqlTestContainer {
+public class UserAuthenticationControllerTest implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient webTestClient;
 
