@@ -1,7 +1,5 @@
 package com.taskbuddy.api.presentation.user.request;
 
-import com.taskbuddy.api.utils.Regexps;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.regex.Pattern;
@@ -9,7 +7,7 @@ import java.util.regex.Pattern;
 import static org.springframework.util.StringUtils.hasText;
 
 public record UserSignupRequest(
-        @NotBlank @Email(regexp = Regexps.EMAIL) String email,
+        @NotBlank String email,
         @NotBlank String username,
         @NotBlank String password
 ) {
