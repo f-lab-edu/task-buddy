@@ -8,3 +8,18 @@ spring:
     group:
       local:
         - db
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: contact.taskbuddy@gmail.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  data:
+    redis:
+      host: localhost
+      port: 6379

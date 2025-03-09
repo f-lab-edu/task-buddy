@@ -1,0 +1,42 @@
+package com.taskbuddy.api.persistence.cache;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@Component
+public class RedisCacheManager implements CacheManager {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    @Override
+    public <T> Optional<T> get(String key, Class<T> dataType) {
+        Object value = redisTemplate.opsForValue().get(key);
+
+        if (value == null) {
+            return Optional.empty();
+        }
+
+        assert dataType.isInstance(value) : "data type is incorrect";
+
+        return Optional.of(dataType.cast(value));
+    }
+
+    @Override
+    public boolean hasKey(String key) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    @Override
+    public void save(String key, Object data, Duration timeout) {
+        redisTemplate.opsForValue().set(key, data, timeout);
+    }
+
+    @Override
+    public void delete(String key) {
+        redisTemplate.delete(key);
+    }
+}
