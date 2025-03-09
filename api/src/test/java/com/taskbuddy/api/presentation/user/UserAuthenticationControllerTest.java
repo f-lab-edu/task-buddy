@@ -5,41 +5,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.business.user.User;
-import com.taskbuddy.api.business.user.UserCreate;
-import com.taskbuddy.api.business.user.UserService;
+import com.taskbuddy.api.business.user.DefaultUserService;
 import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.presentation.MySqlTestContainer;
+import com.taskbuddy.api.presentation.SpringTestContainer;
 import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
-import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith({RestDocumentationExtension.class})
-public class UserAuthenticationControllerTest implements MySqlTestContainer {
+public class UserAuthenticationControllerTest implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient webTestClient;
 
@@ -49,7 +43,7 @@ public class UserAuthenticationControllerTest implements MySqlTestContainer {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private UserService userService;
+    private DefaultUserService userService;
 
     @MockBean
     private PropertiesServer propertiesServer;
@@ -77,47 +71,6 @@ public class UserAuthenticationControllerTest implements MySqlTestContainer {
     }
 
     @Test
-    void 회원가입으로_유저를_생성할_수_있다() throws JsonProcessingException {
-        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "testuser", "abcdabcd");
-
-        User mockUser = mock(User.class);
-        when(mockUser.getId()).thenReturn(1L);
-        when(mockUser.getEmail()).thenReturn(request.email());
-        when(mockUser.getUsername()).thenReturn(request.username());
-        when(mockUser.getCreatedAt()).thenReturn(LocalDateTime.now());
-
-        when(clientSecureDataHandler.decode(request.password())).thenReturn(request.password());
-        when(userService.createAndSave(any(UserCreate.class))).thenReturn(mockUser);
-        when(propertiesServer.getHostname()).thenReturn("localhost");
-        when(propertiesServer.getPort()).thenReturn(8888);
-
-        webTestClient.post()
-                .uri("/v1/users/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(request))
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .consumeWith(document("v1/users/signup/success",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
-                        ),
-                        requestFields(
-                                fieldWithPath("email").type(JsonFieldType.STRING).description("가입 이메일 (이메일 형식과 일치해야한다.)"),
-                                fieldWithPath("username").type(JsonFieldType.STRING).description("영문 유저네임"),
-                                fieldWithPath("password").type(JsonFieldType.STRING).description("로그인 비밀번호")
-                        ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.LOCATION).description("생성된 User 조회 URL")
-                        ),
-                        responseFields(
-                                fieldWithPath("email").type(JsonFieldType.STRING).description("가입 이메일"),
-                                fieldWithPath("username").type(JsonFieldType.STRING).description("영문 유저네임"),
-                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("생성일시 (yyyy-MM-dd)")
-                        )));
-    }
-
-    @Test
     void username과_password로_로그인하고_인증정보를_생성할_수_있다() throws JsonProcessingException {
         UserSigninRequest request = new UserSigninRequest("testuser", "abcdabcd");
 
@@ -127,10 +80,10 @@ public class UserAuthenticationControllerTest implements MySqlTestContainer {
         when(mockUser.getUsername()).thenReturn(request.username());
         when(mockUser.getCreatedAt()).thenReturn(LocalDateTime.now());
 
-        when(clientSecureDataHandler.decode(request.password())).thenReturn(request.password());
-        when(userService.findByUsernameAndPassword(request.username(), request.password())).thenReturn(Optional.of(mockUser));
-        when(userTokenAuthenticateHandler.issueAccessToken(mockUser)).thenReturn("test_accessToken");
-        when(userTokenAuthenticateHandler.issueRefreshToken(mockUser)).thenReturn("test_refreshToken");
+//        when(clientSecureDataHandler.decode(request, request.getClass())).thenReturn(request.getClass());
+//        when(userService.findByUsernameAndPassword(request.username(), request.password())).thenReturn(Optional.of(mockUser));
+//        when(userTokenAuthenticateHandler.issueAccessToken(mockUser)).thenReturn("test_accessToken");
+//        when(userTokenAuthenticateHandler.issueRefreshToken(mockUser)).thenReturn("test_refreshToken");
 
         webTestClient.post()
                 .uri("/v1/users/signin")

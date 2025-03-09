@@ -18,4 +18,12 @@ public class JsonUtils {
             throw new RuntimeException("failed to serialize : " + target.toString(), e);
         }
     }
+
+    public static <R> R deserialize(String target, Class<R> returnClass) {
+        try {
+            return OBJECT_MAPPER.readValue(target, returnClass);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("failed to deserialize : " + target, e);
+        }
+    }
 }
