@@ -9,6 +9,8 @@ public abstract class RandomCodeGenerator {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static int generateConsistingOfOnlyNumbers(int length) {
+        assert length > 0 : "길이는 1 이상이어야 한다.";
+
         int multiply = 9;
         for (int i = 0; i < length-1; i++) {
             multiply *= 10;
@@ -18,6 +20,8 @@ public abstract class RandomCodeGenerator {
     }
 
     public static String generateConsistingOfLettersAndNumbers(int length) {
+        assert length > 0 : "길이는 1 이상이어야 한다.";
+
         return IntStream.range(0, length)
                 .map(i -> CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())))
                 .mapToObj(c -> String.valueOf((char) c))
