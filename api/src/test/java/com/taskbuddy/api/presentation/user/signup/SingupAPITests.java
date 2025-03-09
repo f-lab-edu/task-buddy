@@ -1,6 +1,8 @@
 package com.taskbuddy.api.presentation.user.signup;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.taskbuddy.api.presentation.MySqlTestContainer;
+import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,5 +59,46 @@ public class SingupAPITests implements MySqlTestContainer {
     @Test
     void 요청파라미터가_유효성검증에_통과했다면_API응답_상태코드는_200이어야_한다() {
 
+    }
+
+    @Test
+    void 회원가입으로_유저를_생성할_수_있다() throws JsonProcessingException {
+        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "testuser", "abcdabcd");
+
+//        User mockUser = mock(User.class);
+//        when(mockUser.getId()).thenReturn(1L);
+//        when(mockUser.getEmail()).thenReturn(request.email());
+//        when(mockUser.getUsername()).thenReturn(request.username());
+//        when(mockUser.getCreatedAt()).thenReturn(LocalDateTime.now());
+//
+//        when(clientSecureDataHandler.decode(request.password())).thenReturn(request.password());
+//        when(userService.createAndSave(any(UserCreate.class))).thenReturn(mockUser);
+//        when(propertiesServer.getHostname()).thenReturn("localhost");
+//        when(propertiesServer.getPort()).thenReturn(8888);
+//
+//        webTestClient.post()
+//                .uri("/v1/users/signup")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(JsonUtils.serialize(request))
+//                .exchange()
+//                .expectStatus().isCreated()
+//                .expectBody()
+//                .consumeWith(document("v1/users/signup/success",
+//                        requestHeaders(
+//                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
+//                        ),
+//                        requestFields(
+//                                fieldWithPath("email").type(JsonFieldType.STRING).description("가입 이메일 (이메일 형식과 일치해야한다.)"),
+//                                fieldWithPath("username").type(JsonFieldType.STRING).description("영문 유저네임"),
+//                                fieldWithPath("password").type(JsonFieldType.STRING).description("로그인 비밀번호")
+//                        ),
+//                        responseHeaders(
+//                                headerWithName(HttpHeaders.LOCATION).description("생성된 User 조회 URL")
+//                        ),
+//                        responseFields(
+//                                fieldWithPath("email").type(JsonFieldType.STRING).description("가입 이메일"),
+//                                fieldWithPath("username").type(JsonFieldType.STRING).description("영문 유저네임"),
+//                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("생성일시 (yyyy-MM-dd)")
+//                        )));
     }
 }
