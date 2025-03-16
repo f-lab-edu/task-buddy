@@ -1,21 +1,25 @@
 package com.taskbuddy.api.presentation.user.signup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.taskbuddy.api.presentation.MySqlTestContainer;
+import com.taskbuddy.api.presentation.SpringTestContainer;
 import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
 @DisplayName("[회원가입 API] POST /signup")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith({RestDocumentationExtension.class})
-public class SingupAPITests implements MySqlTestContainer {
+public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient client;
 
@@ -41,24 +45,19 @@ public class SingupAPITests implements MySqlTestContainer {
      * - 201 응답
      */
 
-    @Test
-    void 요청파라미터가_비밀키로_복호화가_되지_않는다면_406응답이어야_한다() {
+    @BeforeEach
+    void setup(RestDocumentationContextProvider restDocumentation) {
+        this.client = WebTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .filter(WebTestClientRestDocumentation.documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
+                .build();
 
-    }
-
-    @Test
-    void 유효하지_않은_요청파라미터라면_API응답_상태코드는_400이어야_한다() {
-
-    }
-
-    @Test
-    void 요청_이메일로_이미_사용중인_계정이_존재한다면_API응답_상태코드는_409이어야_한다() {
-
-    }
-
-    @Test
-    void 요청파라미터가_유효성검증에_통과했다면_API응답_상태코드는_200이어야_한다() {
-
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
     @Test
@@ -100,5 +99,25 @@ public class SingupAPITests implements MySqlTestContainer {
 //                                fieldWithPath("username").type(JsonFieldType.STRING).description("영문 유저네임"),
 //                                fieldWithPath("createdAt").type(JsonFieldType.STRING).description("생성일시 (yyyy-MM-dd)")
 //                        )));
+    }
+
+    @Test
+    void 요청파라미터가_비밀키로_복호화가_되지_않는다면_406응답이어야_한다() {
+
+    }
+
+    @Test
+    void 유효하지_않은_요청파라미터라면_API응답_상태코드는_400이어야_한다() {
+
+    }
+
+    @Test
+    void 요청_이메일로_이미_사용중인_계정이_존재한다면_API응답_상태코드는_409이어야_한다() {
+
+    }
+
+    @Test
+    void 요청파라미터가_유효성검증에_통과했다면_API응답_상태코드는_200이어야_한다() {
+
     }
 }

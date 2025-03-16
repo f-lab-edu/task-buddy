@@ -33,6 +33,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
+// TODO #signup 테스트 분리
 public class UserAuthenticationControllerTest implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient webTestClient;
