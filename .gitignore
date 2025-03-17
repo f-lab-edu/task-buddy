@@ -7,3 +7,6 @@ out
 .idea
 *.env
 init-users.sql
+
+### Secure ###
+.keys
