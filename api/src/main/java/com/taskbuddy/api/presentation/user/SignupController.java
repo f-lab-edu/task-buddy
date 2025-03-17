@@ -7,7 +7,7 @@ import com.taskbuddy.api.business.user.dto.SignupSession;
 import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.presentation.ResultCodes;
-import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
+import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
 import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import com.taskbuddy.api.presentation.user.response.UserSignupResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +27,16 @@ import java.time.Duration;
 @RestController
 public class SignupController {
     private final DefaultUserService userService;
-    private final ClientSecureDataHandler clientSecureDataHandler;
+    private final SecureDataDecryptor clientDataDecryptor;
     private final PropertiesServer propertiesServer;
 
-    private static final String SESSION_KEY_NAME = "x-session-key";
+    private static final String SESSION_KEY_NAME = "X-session-key";
+    private static final Duration COOKIE_MAX_AGE = Duration.ofMinutes(5);
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody String encodedRequest) {
         // 1. Private Key로 암호화
-        final UserSignupRequest request = clientSecureDataHandler.decode(encodedRequest, UserSignupRequest.class);
+        final UserSignupRequest request = clientDataDecryptor.decrypt(encodedRequest, UserSignupRequest.class);
 
         // 2. 파라미터 유효성 검증
         if (!request.isValid()) {
@@ -48,7 +49,7 @@ public class SignupController {
         final ResponseCookie cookie = ResponseCookie.from(SESSION_KEY_NAME, session.key())
                 .httpOnly(true)
 //                .secure(true) // 주석 - 개발환경
-                .maxAge(Duration.ofMinutes(5))
+                .maxAge(COOKIE_MAX_AGE)
                 .sameSite("Strict")
                 .build();
 
