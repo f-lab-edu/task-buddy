@@ -1,5 +1,7 @@
 package com.taskbuddy.api.presentation.secure;
 
+import com.taskbuddy.api.error.exception.InvalidSecretKeyException;
+
 @FunctionalInterface
 public interface SecureDataDecryptor {
 
@@ -10,7 +12,7 @@ public interface SecureDataDecryptor {
      * @param returnClass 복호화된 데이터를 변환할 객체 타입
      * @param <R> 변환할 객체의 타입
      * @return 복호화된 데이터가 변환된 객체
-     * @throws IllegalArgumentException 복호화에 실패하거나 데이터를 변환할 수 없는 경우 발생
+     * @throws InvalidSecretKeyException 복호화에 실패하거나 데이터를 변환할 수 없는 경우 발생
      */
-    <R> R decrypt(String encryptedData, Class<R> returnClass);
+    <R> R decrypt(String encryptedData, Class<R> returnClass) throws InvalidSecretKeyException;
 }

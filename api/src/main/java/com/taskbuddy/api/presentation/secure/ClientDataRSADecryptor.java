@@ -1,6 +1,8 @@
 package com.taskbuddy.api.presentation.secure;
 
 import com.taskbuddy.api.config.ApplicationProfile;
+import com.taskbuddy.api.error.exception.InvalidSecretKeyException;
+import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.utils.JsonUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -28,7 +30,7 @@ import java.util.Base64;
 public class ClientDataRSADecryptor implements SecureDataDecryptor {
     private static final String ENV_VAR = "RSA_PRIVATE_KEY_PATH";
 
-    public <R> R decrypt(String encryptedData, Class<R> returnClass) {
+    public <R> R decrypt(String encryptedData, Class<R> returnClass) throws InvalidSecretKeyException {
         PrivateKey privateKey = loadPrivateKey();
 
         try {
@@ -41,7 +43,7 @@ public class ClientDataRSADecryptor implements SecureDataDecryptor {
             return JsonUtils.deserialize(decryptedData, returnClass);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException |
                  InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
-            throw new RuntimeException(e);
+            throw new InvalidSecretKeyException(ResultCodes.A0002);
         }
     }
 
@@ -54,7 +56,7 @@ public class ClientDataRSADecryptor implements SecureDataDecryptor {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePrivate(spec);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException(e);
+            throw new InvalidSecretKeyException(ResultCodes.A0002);
         }
     }
 }
