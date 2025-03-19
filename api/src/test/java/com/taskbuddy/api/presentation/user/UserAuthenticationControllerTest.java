@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.taskbuddy.api.business.user.SigninService;
 import com.taskbuddy.api.business.user.User;
-import com.taskbuddy.api.business.user.DefaultUserService;
 import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.presentation.MySqlTestContainer;
 import com.taskbuddy.api.presentation.SpringTestContainer;
-import com.taskbuddy.api.presentation.secure.ClientSecureDataHandler;
+import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,13 +44,13 @@ public class UserAuthenticationControllerTest implements SpringTestContainer, My
     private ObjectMapper objectMapper;
 
     @MockBean
-    private DefaultUserService userService;
+    private SigninService userService;
 
     @MockBean
     private PropertiesServer propertiesServer;
 
     @MockBean
-    private ClientSecureDataHandler clientSecureDataHandler;
+    private SecureDataDecryptor secureDataDecryptor;
 
     @MockBean
     private UserTokenAuthenticateHandler userTokenAuthenticateHandler;
