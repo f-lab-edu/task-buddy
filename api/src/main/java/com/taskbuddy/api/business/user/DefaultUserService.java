@@ -24,13 +24,68 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class DefaultUserService implements SignupService {
+public class DefaultUserService implements SignupService, SigninService {
     private final UserJpaRepository userJpaRepository;
     private final JavaMailSender javaMailSender;
     private final CacheManager cacheManager;
 
     private static final int LENGTH_OF_SESSION_KEY = 50;
     private static final int LENGTH_OF_VERIFICATION_CODE = 6;
+
+    public Optional<User> findByUsernameAndPassword(String username, String password) {
+        /**
+         * username으로 유저를 조회 (존재하지 않으면 실패)
+         * password가 일치하는지 확인 (라이브러리 사용)
+         */
+
+        return Optional.empty();
+    }
+
+    @Override
+    public SignupSession signup(UserSignupRequest request) {
+        // 3. 이메일 중복검사
+        boolean existedEmail = userJpaRepository.existsByEmail(request.email());
+        if (existedEmail) {
+            throw new DuplicateEmailException(ResultCodes.U1001);
+        }
+
+        boolean existedUsername = userJpaRepository.existsByUsername(request.username());
+        if (existedUsername) {
+            throw new DuplicateEmailException(ResultCodes.U1002);
+        }
+
+        final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
+        final int verificationCode = RandomCodeGenerator.generateConsistingOfOnlyNumbers(LENGTH_OF_VERIFICATION_CODE);
+
+        sendEmail(request.email(), verificationCode);
+
+        // 4. 캐시 저장 (이메일, 인증코드, 세션 Key)
+        final String cacheKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey);
+        SignupCache cache = new SignupCache(verificationCode, request);
+        cacheManager.save(cacheKey, cache, Duration.ofMinutes(5));
+
+        return new SignupSession(sessionKey);
+    }
+
+    // TODO #signup email sender 클래스 추출
+    private void sendEmail(String email, int verificationCode) {
+        final String fixedTitle = "[task buddy] 회원가입 인증번호 안내";
+        final String content =
+                "안녕하세요. Task Buddy 입니다. \n" +
+                "아래 인증번호를 입력하여 이메일 인증 및 회원가입을 완료해주세요. \n\n" +
+                "인증번호 : " + verificationCode;
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject(fixedTitle);
+            helper.setText(content);
+        } catch (MessagingException e) {
+            throw new ApplicationException(ResultCodes.U1003);
+        }
+    }
 
     public User createAndSave(UserCreate userCreate) {
         validateIfEmailAndUsernameAreUnique(userCreate.email(), userCreate.username());
@@ -69,58 +124,5 @@ public class DefaultUserService implements SignupService {
 
 //        return userJpaRepository.save(entity);
         return entity;
-    }
-
-    public Optional<User> findByUsernameAndPassword(String username, String password) {
-        /**
-         * username으로 유저를 조회 (존재하지 않으면 실패)
-         * password가 일치하는지 확인 (라이브러리 사용)
-         */
-
-        return Optional.empty();
-    }
-
-    public SignupSession signup(UserSignupRequest request) {
-        // 3. 이메일 중복검사
-        boolean existedEmail = userJpaRepository.existsByEmail(request.email());
-        if (existedEmail) {
-            throw new DuplicateEmailException(ResultCodes.U1001);
-        }
-
-        boolean existedUsername = userJpaRepository.existsByUsername(request.username());
-        if (existedUsername) {
-            throw new DuplicateEmailException(ResultCodes.U1002);
-        }
-
-        final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
-        final int verificationCode = RandomCodeGenerator.generateConsistingOfOnlyNumbers(LENGTH_OF_VERIFICATION_CODE);
-
-        sendEmail(request.email(), verificationCode);
-
-        // 4. 캐시 저장 (이메일, 인증코드, 세션 Key)
-        final String cacheKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey);
-        SignupCache cache = new SignupCache(verificationCode, request);
-        cacheManager.save(cacheKey, cache, Duration.ofMinutes(5));
-
-        return new SignupSession(sessionKey);
-    }
-
-    private void sendEmail(String email, int verificationCode) {
-        final String fixedTitle = "[task buddy] 회원가입 인증번호 안내";
-        final String content =
-                "안녕하세요. Task Buddy 입니다. \n" +
-                "아래 인증번호를 입력하여 이메일 인증 및 회원가입을 완료해주세요. \n\n" +
-                "인증번호 : " + verificationCode;
-
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(email);
-            helper.setSubject(fixedTitle);
-            helper.setText(content);
-        } catch (MessagingException e) {
-            throw new ApplicationException(ResultCodes.U1003);
-        }
     }
 }

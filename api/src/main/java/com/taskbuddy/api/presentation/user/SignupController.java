@@ -1,6 +1,6 @@
 package com.taskbuddy.api.presentation.user;
 
-import com.taskbuddy.api.business.user.DefaultUserService;
+import com.taskbuddy.api.business.user.SignupService;
 import com.taskbuddy.api.business.user.User;
 import com.taskbuddy.api.business.user.UserCreate;
 import com.taskbuddy.api.business.user.dto.SignupSession;
@@ -26,7 +26,7 @@ import java.time.Duration;
 @RequestMapping("/v1")
 @RestController
 public class SignupController {
-    private final DefaultUserService userService;
+    private final SignupService signupService;
     private final SecureDataDecryptor clientDataDecryptor;
     private final PropertiesServer propertiesServer;
 
@@ -43,7 +43,7 @@ public class SignupController {
             throw new ApplicationException(ResultCodes.C1001);
         }
 
-        final SignupSession session = userService.signup(request);
+        final SignupSession session = signupService.signup(request);
 
         // 5. 세션 Key 쿠키에 담아 응답
         final ResponseCookie cookie = ResponseCookie.from(SESSION_KEY_NAME, session.key())
@@ -63,7 +63,7 @@ public class SignupController {
         final UserCreate userCreate = new UserCreate(request.email(), request.username(), request.password());
 
         // presentation 단계에서 검증을 거친 값들을 전달
-        final User user = userService.createAndSave(userCreate);
+        final User user = signupService.createAndSave(userCreate);
 
         return ResponseEntity
                 .created(URI.create(propertiesServer.getHostname() + ":" + propertiesServer.getPort() + "/users/details/" + user.getId()))

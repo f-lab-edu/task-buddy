@@ -27,4 +27,7 @@ public interface SignupService {
      */
     @NotNull
     SignupSession signup(@NotNull UserSignupRequest request) throws DuplicateEmailException, DuplicateUsernameException;
+
+    @NotNull
+    User createAndSave(@NotNull UserCreate userCreate);
 }
