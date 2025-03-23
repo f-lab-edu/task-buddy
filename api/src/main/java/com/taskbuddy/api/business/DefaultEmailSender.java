@@ -21,7 +21,6 @@ public class DefaultEmailSender implements EmailSender {
     @Override
     public void sendAsync(String receiver, String title, String content) {
         boolean isSucceed = true;
-        long start = System.currentTimeMillis();
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -37,9 +36,6 @@ public class DefaultEmailSender implements EmailSender {
             isSucceed = false;
             throw new ApplicationException(ResultCodes.U1003);
         } finally {
-            long end = System.currentTimeMillis();
-            System.out.println("메일 발송 소요시간: " + (end-start) + "ms");
-
             if (isSucceed) {
                 log.info("이메일 발송 완료: {}", receiver);
             } else {
