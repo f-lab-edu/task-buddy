@@ -1,5 +1,6 @@
 package com.taskbuddy.api.persistence.cache;
 
+import com.taskbuddy.api.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,8 @@ public class RedisCacheManager implements CacheManager {
 
     @Override
     public void save(String key, Object data, Duration timeout) {
-        redisTemplate.opsForValue().set(key, data, timeout);
+        final String serializedData = JsonUtils.serialize(data);
+        redisTemplate.opsForValue().set(key, serializedData, timeout);
     }
 
     @Override
