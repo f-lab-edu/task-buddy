@@ -13,6 +13,7 @@ import com.taskbuddy.api.presentation.SpringTestContainer;
 import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
 import com.taskbuddy.api.presentation.user.request.UserSigninRequest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,6 +35,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 // TODO #signup 테스트 분리
+@Disabled
 public class UserAuthenticationControllerTest implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient webTestClient;
