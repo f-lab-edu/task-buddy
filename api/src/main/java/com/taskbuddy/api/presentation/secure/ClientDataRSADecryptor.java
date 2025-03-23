@@ -22,9 +22,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
-// Issue : Client -> Server 통신할 때 암호화하는 이유
-// Issue : Server가 Client 데이터를 신뢰하도록 세탁하는 과정
-// Issue : 운영환경이라면 Key 관리 방법
+// Issue(#32) : Client -> Server 통신할 때 암호화하는 이유
+// Issue(#32) : Server가 Client 데이터를 신뢰하도록 세탁하는 과정
+// Issue(#32) : 운영환경이라면 Key 관리 방법
 @Profile({ApplicationProfile.DEV, ApplicationProfile.PROD})
 @Component
 public class ClientDataRSADecryptor implements SecureDataDecryptor {

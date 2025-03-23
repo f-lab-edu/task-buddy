@@ -16,6 +16,7 @@ public interface CacheManager {
 
     void delete(@NotBlank String key);
 
+    // Issue(#32) : RedisCache 패턴 검색하는 과정
     @RequiredArgsConstructor
     enum Keys {
         SIGNUP_VERIFICATION("SIGNUP:VERIFICATION:EMAIL:%s", "회원가입 인증"),
