@@ -25,6 +25,7 @@ public class DefaultUserService implements SignupService, SigninService {
     private final EmailSender emailSender;
     private final CacheManager cacheManager;
 
+    private static final Duration VERIFICATION_TIMEOUT = Duration.ofMinutes(5);
     private static final int LENGTH_OF_SESSION_KEY = 50;
     private static final int LENGTH_OF_VERIFICATION_CODE = 6;
 
@@ -51,11 +52,19 @@ public class DefaultUserService implements SignupService, SigninService {
         if (exists) {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
+
+        if (cacheManager.hasKey(CacheManager.Keys.SIGNUP_USED_EMAIL.generate(email))) {
+            throw new DuplicateEmailException(ResultCodes.U1001);
+        }
     }
 
     private void validateIfUsernameDoesNotAlreadyExist(String username) {
         boolean exists = userJpaRepository.existsByUsername(username);
         if (exists) {
+            throw new DuplicateEmailException(ResultCodes.U1002);
+        }
+
+        if (cacheManager.hasKey(CacheManager.Keys.SIGNUP_USED_USERNAME.generate(username))) {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
     }
@@ -71,9 +80,7 @@ public class DefaultUserService implements SignupService, SigninService {
         sendEmail(request.email(), verificationCode);
 
         // 4. 캐시 저장 (이메일, 인증코드, 세션 Key)
-        final String cacheKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey);
-        SignupCache cache = new SignupCache(verificationCode, request);
-        cacheManager.save(cacheKey, cache, Duration.ofMinutes(5));
+        saveCacheData(request, sessionKey, verificationCode);
 
         return new SignupSession(sessionKey);
     }
@@ -86,6 +93,18 @@ public class DefaultUserService implements SignupService, SigninService {
                         "인증번호 : " + verificationCode;
 
         emailSender.sendAsync(email, title, content);
+    }
+
+    private void saveCacheData(UserSignupRequest request, String sessionKey, int verificationCode) {
+        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey, request.email(), request.username());
+        SignupCache verificationValue = new SignupCache(verificationCode, request);
+        cacheManager.save(verificationKey, verificationValue, VERIFICATION_TIMEOUT);
+
+        final String usedEmailKey = CacheManager.Keys.SIGNUP_USED_EMAIL.generate(request.email());
+        cacheManager.save(usedEmailKey, Boolean.TRUE.toString(), VERIFICATION_TIMEOUT);
+
+        final String usedUsernameKey = CacheManager.Keys.SIGNUP_USED_USERNAME.generate(request.username());
+        cacheManager.save(usedUsernameKey, Boolean.TRUE.toString(), VERIFICATION_TIMEOUT);
     }
 
     public User createAndSave(UserCreate userCreate) {

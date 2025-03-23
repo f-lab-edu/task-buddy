@@ -19,6 +19,8 @@ public interface CacheManager {
     @RequiredArgsConstructor
     enum Keys {
         SIGNUP_VERIFICATION("SIGNUP:VERIFICATION:EMAIL:%s", "회원가입 인증"),
+        SIGNUP_USED_EMAIL("SIGNUP:USED:EMAIL:%s", "사용중인 이메일"),
+        SIGNUP_USED_USERNAME("SIGNUP:USED:USERNAME:%s", "사용중인 유저네임"),
         ;
 
         private final String format;
