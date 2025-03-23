@@ -14,6 +14,8 @@ public enum ResultCodes {
     C1001(HttpStatus.BAD_REQUEST, "invalid parameter state"),
 
     // Auth
+    A0001(HttpStatus.CONFLICT, "Already Exists"),
+    A0002(HttpStatus.NOT_ACCEPTABLE, "invalid secret key"),
 
     // User
     U1001(HttpStatus.CONFLICT, "duplicated email"),
