@@ -3,6 +3,7 @@ package com.taskbuddy.api.business.user;
 import com.taskbuddy.api.business.EmailSender;
 import com.taskbuddy.api.business.user.dto.SignupCache;
 import com.taskbuddy.api.business.user.dto.SignupSession;
+import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.error.exception.DuplicateEmailException;
 import com.taskbuddy.api.persistence.cache.CacheManager;
 import com.taskbuddy.api.persistence.repository.UserJpaRepository;
@@ -16,6 +17,9 @@ import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -61,7 +65,7 @@ public class DefaultUserService implements SignupService {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
 
-        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.generate(email, CacheManager.WILD_CARD_PATTERN))) {
+        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.pattern(new AbstractMap.SimpleEntry<>("EMAIL", email)))) {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
     }
@@ -72,7 +76,7 @@ public class DefaultUserService implements SignupService {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
 
-        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.generate(CacheManager.WILD_CARD_PATTERN, username))) {
+        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.pattern(new AbstractMap.SimpleEntry<>("USERNAME", username)))) {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
     }
@@ -88,12 +92,28 @@ public class DefaultUserService implements SignupService {
     }
 
     private void saveCacheData(String sessionKey, SignupCache verificationValue) {
-        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey, verificationValue.email(), verificationValue.username());
+        // TODO #signup 캐시 동적데이터 매핑 로직 개선하기
+        Map<String, String> argMap = new HashMap<>();
+        argMap.put("SESSION", sessionKey);
+        argMap.put("EMAIL", verificationValue.email());
+        argMap.put("USERNAME", verificationValue.username());
+
+        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(argMap);
 
         cacheManager.save(verificationKey, verificationValue, VERIFICATION_TIMEOUT);
     }
 
     @Override
+    public User signupComplete(String sessionKey, String verificationCode) {
+        /**
+         * 회원가입 요청정보 조회
+         */
+        SignupCache signupCache = cacheManager.get(sessionKey, SignupCache.class)
+                .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
+
+        return null;
+    }
+
     public User createAndSave(UserCreate userCreate) {
         validateIfEmailAndUsernameAreUnique(userCreate.email(), userCreate.username());
         final String encodedPassword = encodePassword(userCreate.password());

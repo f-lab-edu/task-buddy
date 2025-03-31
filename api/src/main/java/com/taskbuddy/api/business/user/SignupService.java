@@ -4,6 +4,7 @@ import com.taskbuddy.api.business.user.dto.SignupSession;
 import com.taskbuddy.api.error.exception.DuplicateEmailException;
 import com.taskbuddy.api.error.exception.DuplicateUsernameException;
 import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public interface SignupService {
@@ -29,5 +30,5 @@ public interface SignupService {
     SignupSession signup(@NotNull UserSignupRequest request) throws DuplicateEmailException, DuplicateUsernameException;
 
     @NotNull
-    User createAndSave(@NotNull UserCreate userCreate);
+    User signupComplete(@NotBlank String sessionKey, @NotBlank String verificationCode);
 }
