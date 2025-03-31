@@ -16,26 +16,34 @@ import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class DefaultUserService implements SignupService, SigninService {
-    private final UserJpaRepository userJpaRepository;
-    private final EmailSender emailSender;
-    private final CacheManager cacheManager;
-
+public class DefaultUserService implements SignupService {
     private static final Duration VERIFICATION_TIMEOUT = Duration.ofMinutes(5);
     private static final int LENGTH_OF_SESSION_KEY = 50;
     private static final int LENGTH_OF_VERIFICATION_CODE = 6;
 
-    public Optional<User> findByUsernameAndPassword(String username, String password) {
-        /**
-         * username으로 유저를 조회 (존재하지 않으면 실패)
-         * password가 일치하는지 확인 (라이브러리 사용)
-         */
+    private final UserJpaRepository userJpaRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailSender emailSender;
+    private final CacheManager cacheManager;
 
-        return Optional.empty();
+    @Override
+    public SignupSession signup(UserSignupRequest request) {
+        validateIfEmailAndUsernameAreUnique(request.email(), request.username());
+
+        final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
+        final int verificationCode = RandomCodeGenerator.generateConsistingOfOnlyNumbers(LENGTH_OF_VERIFICATION_CODE);
+
+        sendEmail(request.email(), verificationCode);
+
+        final String hashedPassword = passwordEncoder.encode(request.password());
+
+        final SignupCache cacheValue = new SignupCache(verificationCode, request.email(), request.username(), hashedPassword);
+        saveCacheData(sessionKey, cacheValue);
+
+        return new SignupSession(sessionKey);
     }
 
     private void validateIfEmailAndUsernameAreUnique(String email, String username) {
@@ -53,7 +61,7 @@ public class DefaultUserService implements SignupService, SigninService {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
 
-        if (cacheManager.hasKey(CacheManager.Keys.SIGNUP_USED_EMAIL.generate(email))) {
+        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.generate(email, CacheManager.WILD_CARD_PATTERN))) {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
     }
@@ -64,25 +72,9 @@ public class DefaultUserService implements SignupService, SigninService {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
 
-        if (cacheManager.hasKey(CacheManager.Keys.SIGNUP_USED_USERNAME.generate(username))) {
+        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.generate(CacheManager.WILD_CARD_PATTERN, username))) {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
-    }
-
-    @Override
-    public SignupSession signup(UserSignupRequest request) {
-        // 3. 이메일 중복검사
-        validateIfEmailAndUsernameAreUnique(request.email(), request.username());
-
-        final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
-        final int verificationCode = RandomCodeGenerator.generateConsistingOfOnlyNumbers(LENGTH_OF_VERIFICATION_CODE);
-
-        sendEmail(request.email(), verificationCode);
-
-        // 4. 캐시 저장 (이메일, 인증코드, 세션 Key)
-        saveCacheData(request, sessionKey, verificationCode);
-
-        return new SignupSession(sessionKey);
     }
 
     private void sendEmail(String email, int verificationCode) {
@@ -95,18 +87,13 @@ public class DefaultUserService implements SignupService, SigninService {
         emailSender.sendAsync(email, title, content);
     }
 
-    private void saveCacheData(UserSignupRequest request, String sessionKey, int verificationCode) {
-        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey, request.email(), request.username());
-        SignupCache verificationValue = new SignupCache(verificationCode, request);
+    private void saveCacheData(String sessionKey, SignupCache verificationValue) {
+        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(sessionKey, verificationValue.email(), verificationValue.username());
+
         cacheManager.save(verificationKey, verificationValue, VERIFICATION_TIMEOUT);
-
-        final String usedEmailKey = CacheManager.Keys.SIGNUP_USED_EMAIL.generate(request.email());
-        cacheManager.save(usedEmailKey, Boolean.TRUE.toString(), VERIFICATION_TIMEOUT);
-
-        final String usedUsernameKey = CacheManager.Keys.SIGNUP_USED_USERNAME.generate(request.username());
-        cacheManager.save(usedUsernameKey, Boolean.TRUE.toString(), VERIFICATION_TIMEOUT);
     }
 
+    @Override
     public User createAndSave(UserCreate userCreate) {
         validateIfEmailAndUsernameAreUnique(userCreate.email(), userCreate.username());
         final String encodedPassword = encodePassword(userCreate.password());

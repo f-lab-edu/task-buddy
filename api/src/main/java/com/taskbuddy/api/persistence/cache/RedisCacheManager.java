@@ -2,7 +2,9 @@ package com.taskbuddy.api.persistence.cache;
 
 import com.taskbuddy.api.utils.JsonUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -29,6 +31,17 @@ public class RedisCacheManager implements CacheManager {
     @Override
     public boolean hasKey(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+    }
+
+    @Override
+    public boolean existsByPattern(String pattern) {
+        Cursor<byte[]> cursor = redisTemplate.executeWithStickyConnection(redisConnection ->
+                redisConnection.scan(ScanOptions.scanOptions().match(pattern).count(1000).build())
+        );
+
+        try (cursor) {
+            return cursor.hasNext();
+        }
     }
 
     @Override

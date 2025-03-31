@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.taskbuddy.api.business.user.SigninService;
 import com.taskbuddy.api.business.user.User;
 import com.taskbuddy.api.business.user.UserTokenAuthenticateHandler;
 import com.taskbuddy.api.config.PropertiesServer;
@@ -44,9 +43,6 @@ public class UserAuthenticationControllerTest implements SpringTestContainer, My
     private int port;
 
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private SigninService userService;
 
     @MockBean
     private PropertiesServer propertiesServer;
