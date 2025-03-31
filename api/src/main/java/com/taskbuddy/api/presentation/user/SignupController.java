@@ -35,17 +35,14 @@ public class SignupController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody String encodedRequest) {
-        // 1. Private Key로 암호화
         final UserSignupRequest request = clientDataDecryptor.decrypt(encodedRequest, UserSignupRequest.class);
 
-        // 2. 파라미터 유효성 검증
         if (!request.isValid()) {
             throw new ApplicationException(ResultCodes.C1001);
         }
 
         final SignupSession session = signupService.signup(request);
 
-        // 5. 세션 Key 쿠키에 담아 응답
         final ResponseCookie cookie = ResponseCookie.from(SESSION_KEY_NAME, session.key())
                 .httpOnly(true)
 //                .secure(true) // 주석 - 개발환경
