@@ -5,6 +5,7 @@ import com.taskbuddy.api.business.user.dto.SignupCache;
 import com.taskbuddy.api.business.user.dto.SignupSession;
 import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.error.exception.DuplicateEmailException;
+import com.taskbuddy.api.persistence.cache.CacheKeys;
 import com.taskbuddy.api.persistence.cache.CacheManager;
 import com.taskbuddy.api.persistence.repository.UserJpaRepository;
 import com.taskbuddy.api.presentation.ResultCodes;
@@ -17,7 +18,6 @@ import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public class DefaultUserService implements SignupService {
 
     @Override
     public SignupSession signup(UserSignupRequest request) {
-        validateIfEmailAndUsernameAreUnique(request.email(), request.username());
+        validateIfEmailAndUsernameAreUnique(request.email(), request.username(), true);
 
         final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
         final int verificationCode = RandomCodeGenerator.generateConsistingOfOnlyNumbers(LENGTH_OF_VERIFICATION_CODE);
@@ -50,34 +50,38 @@ public class DefaultUserService implements SignupService {
         return new SignupSession(sessionKey);
     }
 
-    private void validateIfEmailAndUsernameAreUnique(String email, String username) {
+    private void validateIfEmailAndUsernameAreUnique(String email, String username, boolean validateCache) {
         Assert.notNull(email, "email must not be null");
         Assert.notNull(username, "username must not be null");
 
         // unique 검증 구현
-        validateIfEmailDoesNotAlreadyExist(email);
-        validateIfUsernameDoesNotAlreadyExist(username);
+        validateIfEmailDoesNotAlreadyExist(email, validateCache);
+        validateIfUsernameDoesNotAlreadyExist(username, validateCache);
     }
 
-    private void validateIfEmailDoesNotAlreadyExist(String email) {
+    private void validateIfEmailDoesNotAlreadyExist(String email, boolean validateCache) {
         boolean exists = userJpaRepository.existsByEmail(email);
         if (exists) {
             throw new DuplicateEmailException(ResultCodes.U1001);
         }
 
-        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.pattern(new AbstractMap.SimpleEntry<>("EMAIL", email)))) {
-            throw new DuplicateEmailException(ResultCodes.U1001);
+        if (validateCache) {
+            if (cacheManager.existsByPattern(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("EMAIL", email)))) {
+                throw new DuplicateEmailException(ResultCodes.U1001);
+            }
         }
     }
 
-    private void validateIfUsernameDoesNotAlreadyExist(String username) {
+    private void validateIfUsernameDoesNotAlreadyExist(String username, boolean validateCache) {
         boolean exists = userJpaRepository.existsByUsername(username);
         if (exists) {
             throw new DuplicateEmailException(ResultCodes.U1002);
         }
 
-        if (cacheManager.existsByPattern(CacheManager.Keys.SIGNUP_VERIFICATION.pattern(new AbstractMap.SimpleEntry<>("USERNAME", username)))) {
-            throw new DuplicateEmailException(ResultCodes.U1002);
+        if (validateCache) {
+            if (cacheManager.existsByPattern(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("USERNAME", username)))) {
+                throw new DuplicateEmailException(ResultCodes.U1002);
+            }
         }
     }
 
@@ -98,39 +102,24 @@ public class DefaultUserService implements SignupService {
         argMap.put("EMAIL", verificationValue.email());
         argMap.put("USERNAME", verificationValue.username());
 
-        final String verificationKey = CacheManager.Keys.SIGNUP_VERIFICATION.generate(argMap);
+        final String verificationKey = CacheKeys.SIGNUP_VERIFICATION.generate(argMap);
 
         cacheManager.save(verificationKey, verificationValue, VERIFICATION_TIMEOUT);
     }
 
     @Override
     public User signupComplete(String sessionKey, String verificationCode) {
-        /**
-         * 회원가입 요청정보 조회
-         */
-        SignupCache signupCache = cacheManager.get(sessionKey, SignupCache.class)
+        SignupCache signupCache = cacheManager.get(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
                 .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
 
-        return null;
-    }
+        validateIfEmailAndUsernameAreUnique(signupCache.email(), signupCache.username(), false);
 
-    public User createAndSave(UserCreate userCreate) {
-        validateIfEmailAndUsernameAreUnique(userCreate.email(), userCreate.username());
-        final String encodedPassword = encodePassword(userCreate.password());
-
-        final UserEntity entity = save(userCreate.email(), userCreate.username(), encodedPassword);
+        final UserEntity entity = save(signupCache.email(), signupCache.username(), signupCache.password());
 
         return User.from(entity);
     }
 
-    private String encodePassword(String password) {
-        // 단방향 암호화 (Server -> DB)
-
-        return password;
-    }
-
     private UserEntity save(String email, String username, String password) {
-        // 필드 DB 길이 검증
         final LocalDateTime createDateTime = LocalDateTime.now();
 
         UserEntity entity = UserEntity.builder()
@@ -142,7 +131,6 @@ public class DefaultUserService implements SignupService {
                 .updatedAt(createDateTime)
                 .build();
 
-//        return userJpaRepository.save(entity);
-        return entity;
+        return userJpaRepository.save(entity);
     }
 }
