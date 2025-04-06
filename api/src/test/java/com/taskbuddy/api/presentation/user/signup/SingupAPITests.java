@@ -28,10 +28,12 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static com.taskbuddy.api.presentation.user.SignupController.SESSION_KEY_NAME;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 @DisplayName("[회원가입 API] POST /signup")
@@ -107,7 +109,7 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
                                 fieldWithPath("password").type(JsonFieldType.STRING).description("로그인 비밀번호")
                         ),
                         responseHeaders(
-                                headerWithName(HttpHeaders.SET_COOKIE).description("생성된 세션 키")
+                                headerWithName(SESSION_KEY_NAME).description("생성된 세션 키")
                         )));
     }
 

@@ -24,7 +24,7 @@ public class SignupController {
     private final SecureDataDecryptor clientDataDecryptor;
     private final PropertiesServer propertiesServer;
 
-    private static final String SESSION_KEY_NAME = "X-session-key";
+    public static final String SESSION_KEY_NAME = "X-session-key";
 
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody String encodedRequest) {
@@ -45,9 +45,10 @@ public class SignupController {
     public ResponseEntity<UserSignupResponse> signupComplete(@RequestHeader(name = SESSION_KEY_NAME) String sessionKey,
                                                              @RequestBody UserSignupCompleteRequest request) {
         final User user = signupService.signupComplete(sessionKey, request.verificationCode());
+        final UserSignupResponse response = UserSignupResponse.from(user);
 
         return ResponseEntity
                 .created(URI.create(propertiesServer.getHostname() + ":" + propertiesServer.getPort() + "/users/details/" + user.getId()))
-                .body(UserSignupResponse.from(user));
+                .body(response);
     }
 }
