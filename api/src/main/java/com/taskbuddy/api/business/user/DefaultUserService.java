@@ -50,6 +50,51 @@ public class DefaultUserService implements SignupService {
         return new SignupSession(sessionKey);
     }
 
+    private void sendEmail(String email, String verificationCode) {
+        final String title = "[task buddy] 회원가입 인증번호 안내";
+        final String content =
+                "안녕하세요. Task Buddy 입니다. \n" +
+                        "아래 인증번호를 입력하여 이메일 인증 및 회원가입을 완료해주세요. \n\n" +
+                        "인증번호 : " + verificationCode;
+
+        emailSender.sendAsync(email, title, content);
+    }
+
+    @Override
+    public User signupComplete(String sessionKey, String verificationCode) {
+        SignupCache signupCache = cacheManager.get(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
+                .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
+
+        validateVerificationCode(signupCache, verificationCode);
+
+        final UserEntity savedEntity = saveUser(signupCache.email(), signupCache.username(), signupCache.password());
+
+        invalidateCache(sessionKey, signupCache);
+
+        return User.from(savedEntity);
+    }
+
+    private void validateVerificationCode(SignupCache signupCache, String requestVerificationCode) {
+        if (!signupCache.verificationCode().equals(requestVerificationCode)) {
+            throw new ApplicationException(ResultCodes.U1005);
+        }
+    }
+
+    private UserEntity saveUser(String email, String username, String password) {
+        final LocalDateTime createDateTime = LocalDateTime.now();
+
+        UserEntity entity = UserEntity.builder()
+                .email(email)
+                .username(username)
+                .password(password)
+                .passwordUpdatedAt(createDateTime)
+                .createdAt(createDateTime)
+                .updatedAt(createDateTime)
+                .build();
+
+        return userJpaRepository.save(entity);
+    }
+
     private void validateIfEmailAndUsernameAreUnique(String email, String username) {
         Assert.notNull(email, "email must not be null");
         Assert.notNull(username, "username must not be null");
@@ -81,56 +126,25 @@ public class DefaultUserService implements SignupService {
         }
     }
 
-    private void sendEmail(String email, String verificationCode) {
-        final String title = "[task buddy] 회원가입 인증번호 안내";
-        final String content =
-                "안녕하세요. Task Buddy 입니다. \n" +
-                        "아래 인증번호를 입력하여 이메일 인증 및 회원가입을 완료해주세요. \n\n" +
-                        "인증번호 : " + verificationCode;
+    private void saveCacheData(String sessionKey, SignupCache signupCache) {
+        final String cacheKey = generateCacheKey(sessionKey, signupCache);
 
-        emailSender.sendAsync(email, title, content);
+        cacheManager.save(cacheKey, signupCache, VERIFICATION_TIMEOUT);
     }
 
-    private void saveCacheData(String sessionKey, SignupCache verificationValue) {
+    private void invalidateCache(String sessionKey, SignupCache signupCache) {
+        final String cacheKey = generateCacheKey(sessionKey, signupCache);
+
+        cacheManager.delete(cacheKey);
+    }
+
+    private String generateCacheKey(String sessionKey, SignupCache signupCache) {
         // TODO #signup 캐시 동적데이터 매핑 로직 개선하기
         Map<String, String> argMap = new HashMap<>();
         argMap.put("SESSION", sessionKey);
-        argMap.put("EMAIL", verificationValue.email());
-        argMap.put("USERNAME", verificationValue.username());
+        argMap.put("EMAIL", signupCache.email());
+        argMap.put("USERNAME", signupCache.username());
 
-        final String verificationKey = CacheKeys.SIGNUP_VERIFICATION.generate(argMap);
-
-        cacheManager.save(verificationKey, verificationValue, VERIFICATION_TIMEOUT);
-    }
-
-    @Override
-    public User signupComplete(String sessionKey, String verificationCode) {
-        SignupCache signupCache = cacheManager.get(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
-                .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
-
-        if (!signupCache.verificationCode().equals(verificationCode)) {
-            throw new ApplicationException(ResultCodes.U1005);
-        }
-
-        final UserEntity entity = save(signupCache.email(), signupCache.username(), signupCache.password());
-
-        // 캐시 무효화
-
-        return User.from(entity);
-    }
-
-    private UserEntity save(String email, String username, String password) {
-        final LocalDateTime createDateTime = LocalDateTime.now();
-
-        UserEntity entity = UserEntity.builder()
-                .email(email)
-                .username(username)
-                .password(password)
-                .passwordUpdatedAt(createDateTime)
-                .createdAt(createDateTime)
-                .updatedAt(createDateTime)
-                .build();
-
-        return userJpaRepository.save(entity);
+        return CacheKeys.SIGNUP_VERIFICATION.generate(argMap);
     }
 }
