@@ -9,7 +9,7 @@ import java.util.Map;
 // Issue(#32) : RedisCache 패턴 검색하는 과정
 @RequiredArgsConstructor
 public enum CacheKeys {
-    SIGNUP_VERIFICATION("SIGNUP:VERIFICATION",List.of("SESSION", "EMAIL", "USERNAME"), "회원가입 인증"),
+    SIGNUP_VERIFICATION("SIGNUP:VERIFICATION", List.of("SESSION", "EMAIL", "USERNAME"), "회원가입 인증"),
     ;
 
     private final String prefix;

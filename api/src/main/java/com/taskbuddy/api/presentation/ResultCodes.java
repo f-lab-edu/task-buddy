@@ -22,6 +22,7 @@ public enum ResultCodes {
     U1002(HttpStatus.CONFLICT, "duplicated username"),
     U1003(HttpStatus.INTERNAL_SERVER_ERROR, "failed to send email"),
     U1004(HttpStatus.BAD_REQUEST, "expired to verify email"),
+    U1005(HttpStatus.BAD_REQUEST, "Does Not Match Verification Code"),
 
     // Task
     T1001(HttpStatus.NOT_FOUND, "task not found"),
