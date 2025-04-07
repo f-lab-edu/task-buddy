@@ -62,7 +62,7 @@ public class DefaultUserService implements SignupService {
 
     @Override
     public User signup(String sessionKey, String verificationCode) {
-        SignupCache signupCache = cacheManager.get(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
+        SignupCache signupCache = cacheManager.getSingleValueByPattern(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
                 .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
 
         validateVerificationCode(signupCache, verificationCode);

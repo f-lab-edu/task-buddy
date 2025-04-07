@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface CacheManager {
     <T> Optional<T> get(@NotBlank String key, @NotNull Class<T> dataType);
 
+    <T> Optional<T> getSingleValueByPattern(@NotBlank String pattern, @NotNull Class<T> dataType);
+
     boolean hasKey(@NotBlank String key);
 
     boolean existsByPattern(@NotBlank String pattern);
