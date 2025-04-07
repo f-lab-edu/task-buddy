@@ -9,7 +9,7 @@ import com.taskbuddy.api.persistence.cache.CacheKeys;
 import com.taskbuddy.api.persistence.cache.CacheManager;
 import com.taskbuddy.api.persistence.repository.UserJpaRepository;
 import com.taskbuddy.api.presentation.ResultCodes;
-import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
+import com.taskbuddy.api.presentation.user.request.UserSignupVerifyRequest;
 import com.taskbuddy.api.utils.RandomCodeGenerator;
 import com.taskbuddy.persistence.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class DefaultUserService implements SignupService {
     private final CacheManager cacheManager;
 
     @Override
-    public SignupSession signup(UserSignupRequest request) {
+    public SignupSession signup(UserSignupVerifyRequest request) {
         validateIfEmailAndUsernameAreUnique(request.email(), request.username());
 
         final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);

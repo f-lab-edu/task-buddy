@@ -11,7 +11,7 @@ import com.taskbuddy.api.presentation.MySqlTestContainer;
 import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.presentation.SpringTestContainer;
 import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
-import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
+import com.taskbuddy.api.presentation.user.request.UserSignupVerifyRequest;
 import com.taskbuddy.api.utils.JsonUtils;
 import com.taskbuddy.api.utils.RandomCodeGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,6 +69,8 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
      * - 201 응답
      */
 
+    private static final String API_PATH = "/v1/signup/verify";
+
     @BeforeEach
     void setup(RestDocumentationContextProvider restDocumentation) {
         this.client = WebTestClient.bindToServer()
@@ -85,15 +87,15 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
     }
 
     @Test
-    void 회원가입으로_유저를_생성할_수_있다() {
-        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "TestUser12", "test123456!");
+    void 회원가입_요청을_하면_전달된_가입정보로_가입_인증_요청처리를_할_수_있다() {
+        UserSignupVerifyRequest request = new UserSignupVerifyRequest("testuser@gmail.com", "TestUser12", "test123456!");
 
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(request);
         final String givenSessionKey = String.valueOf(RandomCodeGenerator.generateConsistingOfLettersAndNumbers(50));
         when(signupService.signup(Mockito.any())).thenReturn(new SignupSession(givenSessionKey));
 
         client.post()
-                .uri("/v1/signup")
+                .uri(API_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(JsonUtils.serialize(request))
                 .exchange()
@@ -115,13 +117,13 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
 
     @Test
     void 요청파라미터가_비밀키로_복호화가_되지_않는다면_406응답이어야_한다() {
-        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "TestUser12", "test123456!");
+        UserSignupVerifyRequest request = new UserSignupVerifyRequest("testuser@gmail.com", "TestUser12", "test123456!");
 
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(request);
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenThrow(new InvalidSecretKeyException(ResultCodes.A0002));
 
         client.post()
-                .uri("/v1/signup")
+                .uri(API_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(JsonUtils.serialize(request))
                 .exchange()
@@ -141,14 +143,14 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
 
     @Test
     void 유효하지_않은_요청파라미터라면_API응답_상태코드는_400이어야_한다() {
-        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "TestUser12", "test123456!");
+        UserSignupVerifyRequest request = new UserSignupVerifyRequest("testuser@gmail.com", "TestUser12", "test123456!");
 
-        UserSignupRequest mockRequest = Mockito.mock(UserSignupRequest.class);
+        UserSignupVerifyRequest mockRequest = Mockito.mock(UserSignupVerifyRequest.class);
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(mockRequest);
         when(mockRequest.isValid()).thenReturn(false);
 
         client.post()
-                .uri("/v1/signup")
+                .uri(API_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(JsonUtils.serialize(request))
                 .exchange()
@@ -168,13 +170,13 @@ public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
 
     @Test
     void 요청_이메일로_이미_사용중인_계정이_존재한다면_API응답_상태코드는_409이어야_한다() {
-        UserSignupRequest request = new UserSignupRequest("testuser@gmail.com", "TestUser12", "test123456!");
+        UserSignupVerifyRequest request = new UserSignupVerifyRequest("testuser@gmail.com", "TestUser12", "test123456!");
 
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(request);
         when(signupService.signup(Mockito.any())).thenThrow(new DuplicateEmailException(ResultCodes.A0001));
 
         client.post()
-                .uri("/v1/signup")
+                .uri(API_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(JsonUtils.serialize(request))
                 .exchange()

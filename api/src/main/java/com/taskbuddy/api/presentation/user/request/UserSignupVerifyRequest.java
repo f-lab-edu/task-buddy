@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import static org.springframework.util.StringUtils.hasText;
 
-public record UserSignupRequest(
+public record UserSignupVerifyRequest(
         @NotBlank String email,
         @NotBlank String username,
         @NotBlank String password

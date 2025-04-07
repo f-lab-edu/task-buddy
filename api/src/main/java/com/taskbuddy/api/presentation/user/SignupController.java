@@ -8,7 +8,7 @@ import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
 import com.taskbuddy.api.presentation.user.request.UserSignupCompleteRequest;
-import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
+import com.taskbuddy.api.presentation.user.request.UserSignupVerifyRequest;
 import com.taskbuddy.api.presentation.user.response.UserSignupResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +26,12 @@ public class SignupController {
 
     public static final String SESSION_KEY_NAME = "X-session-key";
 
-    @PostMapping("/signup")
+    /**
+     * 회원가입 요청
+     */
+    @PostMapping("/signup/verify")
     public ResponseEntity<UserSignupResponse> signup(@RequestBody String encodedRequest) {
-        final UserSignupRequest request = clientDataDecryptor.decrypt(encodedRequest, UserSignupRequest.class);
+        final UserSignupVerifyRequest request = clientDataDecryptor.decrypt(encodedRequest, UserSignupVerifyRequest.class);
 
         if (!request.isValid()) {
             throw new ApplicationException(ResultCodes.C1001);
@@ -41,7 +44,10 @@ public class SignupController {
                 .build();
     }
 
-    @PostMapping("/signup/complete")
+    /**
+     * 회원가입
+     */
+    @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signupComplete(@RequestHeader(name = SESSION_KEY_NAME) String sessionKey,
                                                              @RequestBody UserSignupCompleteRequest request) {
         final User user = signupService.signupComplete(sessionKey, request.verificationCode());
