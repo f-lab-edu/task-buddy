@@ -36,8 +36,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
-@DisplayName("[회원가입 API] POST /signup")
-public class SingupAPITests implements SpringTestContainer, MySqlTestContainer {
+@DisplayName("[회원가입 API] POST /signup/verify")
+public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestContainer {
     @Autowired
     private WebTestClient client;
 
