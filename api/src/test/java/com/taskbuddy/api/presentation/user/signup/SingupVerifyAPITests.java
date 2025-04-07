@@ -92,7 +92,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
 
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(request);
         final String givenSessionKey = String.valueOf(RandomCodeGenerator.generateConsistingOfLettersAndNumbers(50));
-        when(signupService.signup(Mockito.any())).thenReturn(new SignupSession(givenSessionKey));
+        when(signupService.signupVerify(Mockito.any())).thenReturn(new SignupSession(givenSessionKey));
 
         client.post()
                 .uri(API_PATH)
@@ -101,7 +101,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .consumeWith(document("v1/signup/success",
+                .consumeWith(document("v1/signup/verify/success",
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -129,7 +129,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .consumeWith(document("v1/signup/failure/decrypt",
+                .consumeWith(document("v1/signup/verify/failure/decrypt",
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -156,7 +156,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .consumeWith(document("v1/signup/failure/invalid-parameters",
+                .consumeWith(document("v1/signup/verify/failure/invalid-parameters",
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),
@@ -173,7 +173,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
         UserSignupVerifyRequest request = new UserSignupVerifyRequest("testuser@gmail.com", "TestUser12", "test123456!");
 
         when(secureDataDecryptor.decrypt(Mockito.any(), Mockito.any())).thenReturn(request);
-        when(signupService.signup(Mockito.any())).thenThrow(new DuplicateEmailException(ResultCodes.A0001));
+        when(signupService.signupVerify(Mockito.any())).thenThrow(new DuplicateEmailException(ResultCodes.A0001));
 
         client.post()
                 .uri(API_PATH)
@@ -182,7 +182,7 @@ public class SingupVerifyAPITests implements SpringTestContainer, MySqlTestConta
                 .exchange()
                 .expectStatus().is4xxClientError()
                 .expectBody()
-                .consumeWith(document("v1/signup/failure/exists-email",
+                .consumeWith(document("v1/signup/verify/failure/exists-email",
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("content type header")
                         ),

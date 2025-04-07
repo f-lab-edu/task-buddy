@@ -34,7 +34,7 @@ public class DefaultUserService implements SignupService {
     private final CacheManager cacheManager;
 
     @Override
-    public SignupSession signup(UserSignupVerifyRequest request) {
+    public SignupSession signupVerify(UserSignupVerifyRequest request) {
         validateIfEmailAndUsernameAreUnique(request.email(), request.username());
 
         final String sessionKey = RandomCodeGenerator.generateConsistingOfLettersAndNumbers(LENGTH_OF_SESSION_KEY);
@@ -61,7 +61,7 @@ public class DefaultUserService implements SignupService {
     }
 
     @Override
-    public User signupComplete(String sessionKey, String verificationCode) {
+    public User signup(String sessionKey, String verificationCode) {
         SignupCache signupCache = cacheManager.get(CacheKeys.SIGNUP_VERIFICATION.pattern(Map.of("SESSION", sessionKey)), SignupCache.class)
                 .orElseThrow(() -> new ApplicationException(ResultCodes.U1004));
 

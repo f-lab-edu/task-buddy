@@ -7,7 +7,7 @@ import com.taskbuddy.api.config.PropertiesServer;
 import com.taskbuddy.api.error.ApplicationException;
 import com.taskbuddy.api.presentation.ResultCodes;
 import com.taskbuddy.api.presentation.secure.SecureDataDecryptor;
-import com.taskbuddy.api.presentation.user.request.UserSignupCompleteRequest;
+import com.taskbuddy.api.presentation.user.request.UserSignupRequest;
 import com.taskbuddy.api.presentation.user.request.UserSignupVerifyRequest;
 import com.taskbuddy.api.presentation.user.response.UserSignupResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class SignupController {
             throw new ApplicationException(ResultCodes.C1001);
         }
 
-        final SignupSession session = signupService.signup(request);
+        final SignupSession session = signupService.signupVerify(request);
 
         return ResponseEntity.ok()
                 .header(SESSION_KEY_NAME, session.key())
@@ -49,8 +49,8 @@ public class SignupController {
      */
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signupComplete(@RequestHeader(name = SESSION_KEY_NAME) String sessionKey,
-                                                             @RequestBody UserSignupCompleteRequest request) {
-        final User user = signupService.signupComplete(sessionKey, request.verificationCode());
+                                                             @RequestBody UserSignupRequest request) {
+        final User user = signupService.signup(sessionKey, request.verificationCode());
         final UserSignupResponse response = UserSignupResponse.from(user);
 
         return ResponseEntity

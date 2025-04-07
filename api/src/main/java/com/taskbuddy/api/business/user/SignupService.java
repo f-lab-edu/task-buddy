@@ -18,7 +18,7 @@ public interface SignupService {
      * @throws DuplicateUsernameException 사용자명이 이미 존재하는 경우
      */
     @NotNull
-    SignupSession signup(@NotNull UserSignupVerifyRequest request) throws DuplicateEmailException, DuplicateUsernameException;
+    SignupSession signupVerify(@NotNull UserSignupVerifyRequest request) throws DuplicateEmailException, DuplicateUsernameException;
 
     /**
      * 인증코드를 통해 가입정보 인증을 완료하면 사용자 계정을 생성 및 저장한다.
@@ -28,5 +28,5 @@ public interface SignupService {
      * @return 생성된 유저 정보
      */
     @NotNull
-    User signupComplete(@NotBlank String sessionKey, @NotBlank String verificationCode);
+    User signup(@NotBlank String sessionKey, @NotBlank String verificationCode);
 }
