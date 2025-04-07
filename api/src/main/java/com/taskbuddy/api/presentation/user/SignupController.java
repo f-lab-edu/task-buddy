@@ -30,7 +30,7 @@ public class SignupController {
      * 회원가입 요청
      */
     @PostMapping("/signup/verify")
-    public ResponseEntity<UserSignupResponse> signup(@RequestBody String encodedRequest) {
+    public ResponseEntity<UserSignupResponse> signupVerify(@RequestBody String encodedRequest) {
         final UserSignupVerifyRequest request = clientDataDecryptor.decrypt(encodedRequest, UserSignupVerifyRequest.class);
 
         if (!request.isValid()) {
