@@ -3,7 +3,7 @@ create table users (
     email varchar(100) unique not null,
     username varchar(100) unique not null,
     password varchar(200) not null,
-    password_update_at timestamp not null,
+    password_updated_at timestamp not null,
     created_at timestamp not null default current_timestamp,
     updated_at timestamp not null default current_timestamp
 );

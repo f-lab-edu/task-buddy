@@ -12,11 +12,10 @@ class RandomCodeGeneratorTest {
     @RepeatedTest(10)
     void 숫자로만_이루어진_랜덤코드를_생성할_수_있다() {
         int length = 6;
-        int code = RandomCodeGenerator.generateConsistingOfOnlyNumbers(length);
+        String code = RandomCodeGenerator.generateConsistingOfOnlyNumbers(length);
 
-        String codeString = String.valueOf(code);
-        assertEquals(length, codeString.length(), "생성된 코드의 길이가 전달된 길이와 같아야 한다.");
-        assertTrue(codeString.matches("\\d+"), "숫자로만 이루어진 코드로 생성되어야 한다.");
+        assertEquals(length, code.length(), "생성된 코드의 길이가 전달된 길이와 같아야 한다.");
+        assertTrue(code.matches("\\d+"), "숫자로만 이루어진 코드로 생성되어야 한다.");
     }
 
     @RepeatedTest(10)
